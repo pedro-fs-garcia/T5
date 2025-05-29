@@ -1,0 +1,52 @@
+[
+	{
+		"id": 1,
+		"nome": "João Silva",
+		"email": "joao.silva@email.com",
+		"telefone": "(11) 98765-4321",
+		"endereco": "Rua das Flores, 123 - São Paulo, SP",
+		"cpf": "123.456.789-00",
+		"dataCadastro": "2024-01-15",
+		"observacoes": "Cliente VIP"
+	},
+	{
+		"id": 2,
+		"nome": "Maria Santos",
+		"email": "maria.santos@email.com",
+		"telefone": "(11) 91234-5678",
+		"endereco": "Av. Paulista, 1000 - São Paulo, SP",
+		"cpf": "987.654.321-00",
+		"dataCadastro": "2024-02-01",
+		"observacoes": "Prefere atendimento pela manhã"
+	},
+	{
+		"id": 3,
+		"nome": "Pedro Oliveira",
+		"email": "pedro.oliveira@email.com",
+		"telefone": "(11) 99876-5432",
+		"endereco": "Rua Augusta, 500 - São Paulo, SP",
+		"cpf": "456.789.123-00",
+		"dataCadastro": "2024-02-15",
+		"observacoes": "Alérgico a produtos com perfume"
+	},
+	{
+		"id": 4,
+		"nome": "Ana Costa",
+		"email": "ana.costa@email.com",
+		"telefone": "(11) 97777-8888",
+		"endereco": "Rua Consolação, 2000 - São Paulo, SP",
+		"cpf": "789.123.456-00",
+		"dataCadastro": "2024-03-01",
+		"observacoes": "Cliente novo"
+	},
+	{
+		"id": 5,
+		"nome": "Carlos Ferreira",
+		"email": "carlos.ferreira@email.com",
+		"telefone": "(11) 96666-7777",
+		"endereco": "Av. Rebouças, 1500 - São Paulo, SP",
+		"cpf": "321.654.987-00",
+		"dataCadastro": "2024-03-15",
+		"observacoes": "Prefere pagamento em dinheiro"
+	}
+]

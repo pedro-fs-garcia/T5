@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "nome": "Ração Premium Cães Adultos",
+    "preco": 89.90,
+    "quantidadeEstoque": 50,
+    "categoria": "alimentacao",
+    "descricao": "Ração premium para cães adultos, 15kg"
+  },
+  {
+    "id": 2,
+    "nome": "Shampoo Hipoalergênico",
+    "preco": 45.50,
+    "quantidadeEstoque": 30,
+    "categoria": "higiene",
+    "descricao": "Shampoo hipoalergênico para cães e gatos, 500ml"
+  },
+  {
+    "id": 3,
+    "nome": "Coleira Ajustável",
+    "preco": 35.00,
+    "quantidadeEstoque": 25,
+    "categoria": "acessorios",
+    "descricao": "Coleira ajustável com fecho de segurança"
+  },
+  {
+    "id": 4,
+    "nome": "Anti-pulgas",
+    "preco": 65.90,
+    "quantidadeEstoque": 40,
+    "categoria": "medicamentos",
+    "descricao": "Anti-pulgas e carrapatos, 4 comprimidos"
+  },
+  {
+    "id": 5,
+    "nome": "Brinquedo Interativo",
+    "preco": 29.90,
+    "quantidadeEstoque": 35,
+    "categoria": "acessorios",
+    "descricao": "Brinquedo interativo para gatos"
+  }
+] 

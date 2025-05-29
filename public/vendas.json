@@ -1,0 +1,97 @@
+[
+  {
+    "id": 1,
+    "data": "2024-03-15",
+    "cliente": {
+      "id": 1,
+      "nome": "João Silva",
+      "email": "joao.silva@email.com",
+      "telefone": "(11) 98765-4321"
+    },
+    "itens": [
+      {
+        "id": 1,
+        "produto": {
+          "id": 1,
+          "nome": "Ração Premium",
+          "preco": 89.90
+        },
+        "quantidade": 2,
+        "subtotal": 179.80
+      },
+      {
+        "id": 2,
+        "servico": {
+          "id": 1,
+          "nome": "Banho e Tosa",
+          "preco": 80.00
+        },
+        "quantidade": 1,
+        "subtotal": 80.00
+      }
+    ],
+    "total": 259.80,
+    "status": "concluida",
+    "formaPagamento": "cartao"
+  },
+  {
+    "id": 2,
+    "data": "2024-03-14",
+    "cliente": {
+      "id": 2,
+      "nome": "Maria Santos",
+      "email": "maria.santos@email.com",
+      "telefone": "(11) 91234-5678"
+    },
+    "itens": [
+      {
+        "id": 3,
+        "produto": {
+          "id": 2,
+          "nome": "Coleira Antipulgas",
+          "preco": 45.50
+        },
+        "quantidade": 1,
+        "subtotal": 45.50
+      }
+    ],
+    "total": 45.50,
+    "status": "concluida",
+    "formaPagamento": "dinheiro"
+  },
+  {
+    "id": 3,
+    "data": "2024-03-13",
+    "cliente": {
+      "id": 3,
+      "nome": "Pedro Oliveira",
+      "email": "pedro.oliveira@email.com",
+      "telefone": "(11) 99876-5432"
+    },
+    "itens": [
+      {
+        "id": 4,
+        "servico": {
+          "id": 2,
+          "nome": "Consulta Veterinária",
+          "preco": 150.00
+        },
+        "quantidade": 1,
+        "subtotal": 150.00
+      },
+      {
+        "id": 5,
+        "produto": {
+          "id": 3,
+          "nome": "Vermífugo",
+          "preco": 35.90
+        },
+        "quantidade": 1,
+        "subtotal": 35.90
+      }
+    ],
+    "total": 185.90,
+    "status": "concluida",
+    "formaPagamento": "pix"
+  }
+] 

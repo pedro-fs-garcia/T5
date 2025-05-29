@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "nome": "Banho e Tosa",
+    "preco": 80.00,
+    "descricao": "Banho completo com shampoo hipoalergênico, tosa higiênica e aparamento das unhas",
+    "duracao": "2 horas",
+    "categoria": "higiene"
+  },
+  {
+    "id": 2,
+    "nome": "Consulta Veterinária",
+    "preco": 150.00,
+    "descricao": "Consulta completa com veterinário especializado",
+    "duracao": "1 hora",
+    "categoria": "saude"
+  },
+  {
+    "id": 3,
+    "nome": "Hospedagem",
+    "preco": 100.00,
+    "descricao": "Hospedagem com alimentação e cuidados básicos",
+    "duracao": "24 horas",
+    "categoria": "hospedagem"
+  },
+  {
+    "id": 4,
+    "nome": "Adestramento Básico",
+    "preco": 200.00,
+    "descricao": "Sessão de adestramento com comandos básicos",
+    "duracao": "1 hora",
+    "categoria": "treinamento"
+  },
+  {
+    "id": 5,
+    "nome": "Spa Day",
+    "preco": 120.00,
+    "descricao": "Tratamento completo com massagem, hidratação e aromaterapia",
+    "duracao": "3 horas",
+    "categoria": "bem-estar"
+  }
+] 

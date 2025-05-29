@@ -1,0 +1,97 @@
+[
+  {
+    "id": 1,
+    "data": "2024-03-15",
+    "fornecedor": {
+      "id": 1,
+      "nome": "PetShop Distribuidora",
+      "email": "contato@petshopdist.com",
+      "telefone": "(11) 3333-4444"
+    },
+    "itens": [
+      {
+        "id": 1,
+        "produto": {
+          "id": 1,
+          "nome": "Ração Premium",
+          "preco": 45.90
+        },
+        "quantidade": 50,
+        "subtotal": 2295.00
+      },
+      {
+        "id": 2,
+        "produto": {
+          "id": 2,
+          "nome": "Coleira Antipulgas",
+          "preco": 25.50
+        },
+        "quantidade": 30,
+        "subtotal": 765.00
+      }
+    ],
+    "total": 3060.00,
+    "status": "concluida",
+    "formaPagamento": "boleto"
+  },
+  {
+    "id": 2,
+    "data": "2024-03-14",
+    "fornecedor": {
+      "id": 2,
+      "nome": "Vet Supplies",
+      "email": "vendas@vetsupplies.com",
+      "telefone": "(11) 4444-5555"
+    },
+    "itens": [
+      {
+        "id": 3,
+        "produto": {
+          "id": 3,
+          "nome": "Vermífugo",
+          "preco": 15.90
+        },
+        "quantidade": 100,
+        "subtotal": 1590.00
+      }
+    ],
+    "total": 1590.00,
+    "status": "pendente",
+    "formaPagamento": "cartao"
+  },
+  {
+    "id": 3,
+    "data": "2024-03-13",
+    "fornecedor": {
+      "id": 3,
+      "nome": "Pet Care Produtos",
+      "email": "compras@petcare.com",
+      "telefone": "(11) 5555-6666"
+    },
+    "itens": [
+      {
+        "id": 4,
+        "produto": {
+          "id": 4,
+          "nome": "Shampoo Hipoalergênico",
+          "preco": 35.90
+        },
+        "quantidade": 20,
+        "subtotal": 718.00
+      },
+      {
+        "id": 5,
+        "produto": {
+          "id": 5,
+          "nome": "Brinquedo Interativo",
+          "preco": 29.90
+        },
+        "quantidade": 15,
+        "subtotal": 448.50
+      }
+    ],
+    "total": 1166.50,
+    "status": "concluida",
+    "formaPagamento": "pix"
+  }
+]

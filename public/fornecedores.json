@@ -1,0 +1,47 @@
+[
+    {
+        "id": 1,
+        "nome": "PetShop Distribuidora",
+        "email": "contato@petshopdistribuidora.com.br",
+        "telefone": "(11) 3333-4444",
+        "endereco": "Av. Paulista, 1000 - São Paulo/SP",
+        "cnpj": "12.345.678/0001-90",
+        "observacoes": "Fornecedor principal de rações e acessórios"
+    },
+    {
+        "id": 2,
+        "nome": "Vet Supplies",
+        "email": "vendas@vetsupplies.com.br",
+        "telefone": "(11) 4444-5555",
+        "endereco": "Rua Augusta, 500 - São Paulo/SP",
+        "cnpj": "98.765.432/0001-10",
+        "observacoes": "Especialista em produtos veterinários"
+    },
+    {
+        "id": 3,
+        "nome": "Pet Care Produtos",
+        "email": "atendimento@petcare.com.br",
+        "telefone": "(11) 5555-6666",
+        "endereco": "Rua Consolação, 2000 - São Paulo/SP",
+        "cnpj": "45.678.901/0001-23",
+        "observacoes": "Fornecedor de produtos de higiene e beleza"
+    },
+    {
+        "id": 4,
+        "nome": "Cão & Gato Distribuidora",
+        "email": "vendas@caoegato.com.br",
+        "telefone": "(11) 6666-7777",
+        "endereco": "Av. Brigadeiro Faria Lima, 1500 - São Paulo/SP",
+        "cnpj": "34.567.890/0001-45",
+        "observacoes": "Fornecedor de brinquedos e acessórios"
+    },
+    {
+        "id": 5,
+        "nome": "Pet Service Solutions",
+        "email": "contato@petservice.com.br",
+        "telefone": "(11) 7777-8888",
+        "endereco": "Rua Oscar Freire, 800 - São Paulo/SP",
+        "cnpj": "23.456.789/0001-67",
+        "observacoes": "Fornecedor de equipamentos e materiais para serviços"
+    }
+] 
