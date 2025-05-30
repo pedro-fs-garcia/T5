@@ -1,101 +1,94 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { atualizarCliente, buscarClientePorId } from '../../services/ClienteService';
+import { Cliente } from '../../models/interfaces';
 
-interface ClienteData {
-    id: number;
-    nome: string;
-    email: string;
-    telefone: string;
-    endereco: string;
-    cpf: string;
-    dataCadastro: string;
-    observacoes: string;
-}
 
 export default function ClienteDetalhes() {
     const { id } = useParams<{ id: string }>();
-    const [cliente, setCliente] = useState<ClienteData | null>(null);
+    const [cliente, setCliente] = useState<Cliente | null>(null);
     const [loading, setLoading] = useState(true);
     const [mensagem, setMensagem] = useState('');
     const [editando, setEditando] = useState(false);
 
     useEffect(() => {
-        fetch('/clientes.json')
-            .then((res) => {
-                if (!res.ok) throw new Error('Erro ao buscar os dados do cliente');
-                return res.json();
-            })
-            .then((data: ClienteData[]) => {
-                const clienteEncontrado = data.find(c => c.id === Number(id));
-                if (clienteEncontrado) {
-                    setCliente(clienteEncontrado);
-                } else {
-                    setMensagem('Cliente não encontrado');
-                }
-            })
-            .catch((err) => setMensagem(`Erro: ${err.message}`))
-            .finally(() => setLoading(false));
+        const buscaCliente = async () => {
+            setLoading(true);
+            try {
+                const dados = await buscarClientePorId(Number(id));
+                setCliente(dados);
+            } catch (error) {
+                console.error("Erro ao buscar cliente:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        buscaCliente();
     }, [id]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         if (!cliente) return;
-        
         const { name, value } = e.target;
-        setCliente(prev => {
-            if (!prev) return null;
-            return {
+
+        if (name.startsWith("endereco.")) {
+            const enderecoField = name.split(".")[1];
+            setCliente(prev => prev ? {
                 ...prev,
-                [name]: value
-            };
-        });
+                endereco: {
+                    ...prev.endereco,
+                    [enderecoField]: value
+                }
+            } : null);
+        } else {
+            setCliente(prev => prev ? { ...prev, [name]: value } : null);
+        }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Aqui você implementaria a lógica para salvar as alterações
-        setMensagem('Alterações salvas com sucesso!');
-        setEditando(false);
+        if (cliente) {
+            await atualizarCliente(cliente);
+            setMensagem('Alterações salvas com sucesso!');
+            setEditando(false);
+        }
     };
 
-    const renderField = (
+    const renderInput = (
         label: string,
-        name: keyof ClienteData,
-        type: 'text' | 'email' | 'tel' | 'textarea' = 'text'
+        name: string,
+        value: string | null,
+        type: 'text' | 'email' = 'text'
     ) => (
-        <div className="mb-3">
-            <label className="form-label">{label}</label>
+        <div className="mb-4">
+            <div className="d-flex justify-content-between align-items-center mb-1">
+                <label className="form-label text-secondary fw-semibold mb-0">{label}</label>
+                {!editando && (
+                    <span className="badge bg-light text-secondary">Visualização</span>
+                )}
+            </div>
+
             {editando ? (
-                type === 'textarea' ? (
-                    <textarea
-                        className="form-control"
-                        name={name}
-                        value={cliente?.[name] || ''}
-                        onChange={handleChange}
-                        rows={3}
-                    />
-                ) : (
-                    <input
-                        type={type}
-                        className="form-control"
-                        name={name}
-                        value={cliente?.[name] || ''}
-                        onChange={handleChange}
-                    />
-                )
+                <input
+                    type={type}
+                    className="form-control shadow-sm rounded-3"
+                    name={name}
+                    value={value ?? ''}
+                    onChange={handleChange}
+                />
             ) : (
-                <p className="form-control-plaintext">{cliente?.[name] || ''}</p>
+                <div className="form-control-plaintext border p-2 rounded bg-light text-black">
+                    {value?.trim() ? value : 'Não informado'}
+                </div>
             )}
         </div>
+
     );
 
     if (loading) {
         return (
-            <div className="container py-4">
-                <div className="text-center">
-                    <div className="spinner-border" role="status">
-                        <span className="visually-hidden">Carregando...</span>
-                    </div>
-                </div>
+            <div className="container py-4 text-center">
+                <div className="spinner-border" role="status" />
             </div>
         );
     }
@@ -103,12 +96,9 @@ export default function ClienteDetalhes() {
     if (mensagem) {
         return (
             <div className="container py-4">
-                <div className="alert alert-success" role="alert">
-                    {mensagem}
-                </div>
+                <div className="alert alert-success">{mensagem}</div>
                 <Link to="/clientes" className="btn btn-outline-secondary">
-                    <i className="bi bi-arrow-left me-2"></i>
-                    Voltar para Clientes
+                    <i className="bi bi-arrow-left me-2"></i> Voltar para Clientes
                 </Link>
             </div>
         );
@@ -117,12 +107,9 @@ export default function ClienteDetalhes() {
     if (!cliente) {
         return (
             <div className="container py-4">
-                <div className="alert alert-warning" role="alert">
-                    Cliente não encontrado
-                </div>
+                <div className="alert alert-warning">Cliente não encontrado</div>
                 <Link to="/clientes" className="btn btn-outline-secondary">
-                    <i className="bi bi-arrow-left me-2"></i>
-                    Voltar para Clientes
+                    <i className="bi bi-arrow-left me-2"></i> Voltar para Clientes
                 </Link>
             </div>
         );
@@ -134,16 +121,17 @@ export default function ClienteDetalhes() {
                 <h2>Detalhes do Cliente</h2>
                 <div>
                     <Link to="/clientes" className="btn btn-outline-secondary me-2">
-                        <i className="bi bi-arrow-left me-2"></i>
-                        Voltar
+                        <i className="bi bi-arrow-left me-2"></i> Voltar
                     </Link>
-                    <button
-                        className="btn btn-primary"
-                        onClick={() => setEditando(!editando)}
-                    >
-                        <i className={`bi bi-${editando ? 'check' : 'pencil'} me-2`}></i>
-                        {editando ? 'Salvar' : 'Editar'}
-                    </button>
+                    {editando ? (
+                        <button className="btn btn-primary" onClick={handleSubmit}>
+                            <i className="bi bi-check me-2" /> Salvar
+                        </button>
+                    ) : (
+                        <button className="btn btn-primary" onClick={() => setEditando(true)}>
+                            <i className="bi bi-pencil me-2" /> Editar
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -153,16 +141,21 @@ export default function ClienteDetalhes() {
                 </div>
                 <div className="card-body">
                     <form onSubmit={handleSubmit}>
-                        {renderField('Nome', 'nome')}
-                        {renderField('E-mail', 'email', 'email')}
-                        {renderField('Telefone', 'telefone', 'tel')}
-                        {renderField('CPF', 'cpf')}
-                        {renderField('Endereço', 'endereco')}
-                        {renderField('Data de Cadastro', 'dataCadastro')}
-                        {renderField('Observações', 'observacoes', 'textarea')}
+                        {renderInput('Nome', 'nome', cliente.nome)}
+                        {renderInput('Nome Social', 'nomeSocial', cliente.nomeSocial)}
+                        {renderInput('E-mail', 'email', cliente.email, 'email')}
+
+                        <h5 className="mt-4">Endereço</h5>
+                        {renderInput('Rua', 'endereco.rua', cliente.endereco.rua)}
+                        {renderInput('Número', 'endereco.numero', cliente.endereco.numero)}
+                        {renderInput('Bairro', 'endereco.bairro', cliente.endereco.bairro)}
+                        {renderInput('Cidade', 'endereco.cidade', cliente.endereco.cidade)}
+                        {renderInput('Estado', 'endereco.estado', cliente.endereco.estado)}
+                        {renderInput('CEP', 'endereco.codigoPostal', cliente.endereco.codigoPostal)}
+                        {renderInput('Complemento', 'endereco.informacoesAdicionais', cliente.endereco.informacoesAdicionais)}
                     </form>
                 </div>
             </div>
         </div>
     );
-} 
+}

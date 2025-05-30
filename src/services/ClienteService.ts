@@ -1,35 +1,79 @@
-import Cliente from "../models/cliente";
-import CPF from "../models/cpf";
-import Pet from "../models/pet";
-import Produto from "../models/produto";
-import Servico from "../models/servico";
-import Telefone from "../models/telefone";
 
-const mockCliente = new Cliente(
-    "João Silva",
-    "João",
-    new CPF("123.456.789-00", new Date("12-12-1997")),
-    new CPF("12.345.567-09", new Date("12-12-1997")),
-    new Date("2023-01-15"),
-    [
-        new Telefone ("12", "99999-9999")
-    ],
-    "joao.silva@email.com",
-    [
-        new Produto(1, "Ração Premium", 89.9, 23 ),
-        new Produto(2, "Brinquedo para Gatos", 29.9, 15),
-        new Produto(3, "Coleira Personalizada", 45.5, 10),
-    ],
-    [
-        new Servico (1, "Banho e Tosa", 70.0),
-        new Servico(2, "Consulta Veterinária", 150.0),
-    ],
-    [
-        new Pet ("Rex", "Golden Retriever", "Macho", "Cachorro"),
-        new Pet("Luna", "Siamês", "Fêmea", "Gato"),
-    ],
-);
+async function buscarInfo(rota: string) {
+    try {
+        const url = `http://localhost:32831${rota}`
+        const resposta = await fetch(url.toString(), {
+            method: "GET",
+            headers: {
+                Accept: "application/json"
+            }
+        });
 
-export function getCliente(idCliente:number) {
-    return mockCliente;
+        const dados = await resposta.json();
+        return dados;
+
+    } catch (e) {
+        return {
+            error: e,
+        }
+    }
+}
+
+export async function buscaListaClientes() {
+    return buscarInfo("/cliente/clientes");
+}
+
+export async function buscarClientePorId(id: number) {
+    return buscarInfo(`/cliente/${id}`);
+}
+
+export async function registrarNovoCliente(cliente: any) {
+    try {
+        const url = `http://localhost:32831/cliente/cadastrar`
+        const resposta = await fetch(url.toString(), {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json" 
+            },
+            body: JSON.stringify(cliente)
+        });
+
+        return resposta;
+
+    } catch (e) {
+        return {
+            error: e,
+        }
+    }
+}
+
+
+export async function excluirCliente(id: number): Promise<Response> {
+    const clienteParaExcluir = {
+        id: id
+    };
+
+    const response = await fetch('http://localhost:32831/cliente/excluir', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(clienteParaExcluir)
+    });
+
+    return response;
+}
+
+
+export async function atualizarCliente(clienteAtualizado: any): Promise<Response> {
+    const response = await fetch('http://localhost:32831/cliente/atualizar', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(clienteAtualizado)
+    });
+
+    return response;
 }

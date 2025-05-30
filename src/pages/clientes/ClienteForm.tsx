@@ -1,85 +1,115 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { registrarNovoCliente } from '../../services/ClienteService';
+import { Cliente, Endereco, Telefone } from '../../models/interfaces';
 
-interface ClienteData {
-    nome: string;
-    email: string;
-    telefone: string;
-    endereco: string;
-    cpf: string;
-    observacoes: string;
-}
 
 export default function ClienteForm() {
-    const [cliente, setCliente] = useState<ClienteData>({
+    const [cliente, setCliente] = useState<Cliente>({
+        id: 0,
         nome: '',
+        nomeSocial: null,
         email: '',
-        telefone: '',
-        endereco: '',
-        cpf: '',
-        observacoes: ''
+        endereco: {
+            id: 0,
+            estado: '',
+            cidade: '',
+            bairro: '',
+            rua: '',
+            numero: '',
+            codigoPostal: '',
+            informacoesAdicionais: '',
+            links: []
+        },
+        telefones: [
+            {
+                id: 0,
+                ddd: '',
+                numero: '',
+                links: []
+            }
+        ],
+        links: []
     });
+
     const [mensagem, setMensagem] = useState('');
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) => {
         const { name, value } = e.target;
-        setCliente(prev => ({
-            ...prev,
-            [name]: value
-        }));
+
+        if (name.startsWith('endereco.')) {
+            const field = name.split('.')[1] as keyof Endereco;
+            setCliente(prev => ({
+                ...prev,
+                endereco: {
+                    ...prev.endereco,
+                    [field]: value
+                }
+            }));
+        } else if (name.startsWith('telefone.')) {
+            const field = name.split('.')[1] as keyof Telefone;
+            setCliente(prev => ({
+                ...prev,
+                telefones: [{
+                    ...prev.telefones[0],
+                    [field]: value
+                }]
+            }));
+        } else {
+            setCliente(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
-        // Validações básicas
-        if (!cliente.nome.trim()) {
-            setMensagem('O nome do cliente é obrigatório');
-            return;
-        }
-        if (!cliente.email.trim()) {
-            setMensagem('O e-mail do cliente é obrigatório');
-            return;
-        }
-        if (!cliente.telefone.trim()) {
-            setMensagem('O telefone do cliente é obrigatório');
-            return;
-        }
-        if (!cliente.cpf.trim()) {
-            setMensagem('O CPF do cliente é obrigatório');
-            return;
-        }
 
-        // Validação de e-mail
+        const { nome, email, telefones } = cliente;
+        const telefone = telefones[0];
+
+        if (!nome.trim()) return setMensagem('O nome é obrigatório');
+        if (!email || !email.trim()) return setMensagem('O e-mail é obrigatório');
+        if (!telefone.ddd || !telefone.numero) return setMensagem('Telefone inválido');
+
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(cliente.email)) {
-            setMensagem('E-mail inválido');
-            return;
-        }
+        if (!emailRegex.test(email)) return setMensagem('E-mail inválido');
 
-        // Validação de CPF (formato básico)
-        const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
-        if (!cpfRegex.test(cliente.cpf)) {
-            setMensagem('CPF inválido. Use o formato: 000.000.000-00');
-            return;
-        }
+        // Aqui você adicionaria a chamada para salvar o cliente no backend
+        console.log('Cliente a ser salvo:', cliente);
+        const resposta = await registrarNovoCliente(cliente);
+        console.log(resposta);
+        // setMensagem('Cliente registrado com sucesso!');
 
-        // Validação de telefone (formato básico)
-        const telefoneRegex = /^\(\d{2}\) \d{5}-\d{4}$/;
-        if (!telefoneRegex.test(cliente.telefone)) {
-            setMensagem('Telefone inválido. Use o formato: (00) 00000-0000');
-            return;
-        }
-
-        // Aqui você implementaria a lógica para salvar o cliente
-        setMensagem('Cliente registrado com sucesso!');
+        // Reset do formulário
         setCliente({
+            id: 0,
             nome: '',
+            nomeSocial: null,
             email: '',
-            telefone: '',
-            endereco: '',
-            cpf: '',
-            observacoes: ''
+            endereco: {
+                id: 0,
+                estado: '',
+                cidade: '',
+                bairro: '',
+                rua: '',
+                numero: '',
+                codigoPostal: '',
+                informacoesAdicionais: '',
+                links: []
+            },
+            telefones: [
+                {
+                    id: 0,
+                    ddd: '',
+                    numero: '',
+                    links: []
+                }
+            ],
+            links: []
         });
     };
 
@@ -106,7 +136,7 @@ export default function ClienteForm() {
                 <div className="card-body">
                     <form onSubmit={handleSubmit}>
                         <div className="mb-3">
-                            <label className="form-label">Nome Completo</label>
+                            <label className="form-label">Nome</label>
                             <input
                                 type="text"
                                 className="form-control"
@@ -118,62 +148,129 @@ export default function ClienteForm() {
                         </div>
 
                         <div className="mb-3">
+                            <label className="form-label">Nome Social</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                name="nomeSocial"
+                                value={cliente.nomeSocial || ''}
+                                onChange={handleChange}
+                            />
+                        </div>
+
+                        <div className="mb-3">
                             <label className="form-label">E-mail</label>
                             <input
                                 type="email"
                                 className="form-control"
                                 name="email"
-                                value={cliente.email}
+                                value={cliente.email || ''}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
 
+                        {/* TELEFONE */}
                         <div className="mb-3">
-                            <label className="form-label">Telefone</label>
-                            <input
-                                type="tel"
-                                className="form-control"
-                                name="telefone"
-                                value={cliente.telefone}
-                                onChange={handleChange}
-                                placeholder="(00) 00000-0000"
-                                required
-                            />
-                        </div>
-
-                        <div className="mb-3">
-                            <label className="form-label">CPF</label>
+                            <label className="form-label">DDD</label>
                             <input
                                 type="text"
                                 className="form-control"
-                                name="cpf"
-                                value={cliente.cpf}
+                                name="telefone.ddd"
+                                value={cliente.telefones[0].ddd}
                                 onChange={handleChange}
-                                placeholder="000.000.000-00"
+                                placeholder="11"
                                 required
                             />
                         </div>
 
                         <div className="mb-3">
-                            <label className="form-label">Endereço</label>
+                            <label className="form-label">Número</label>
                             <input
                                 type="text"
                                 className="form-control"
-                                name="endereco"
-                                value={cliente.endereco}
+                                name="telefone.numero"
+                                value={cliente.telefones[0].numero}
+                                onChange={handleChange}
+                                placeholder="91234-5678"
+                                required
+                            />
+                        </div>
+
+                        {/* ENDEREÇO */}
+                        <div className="mb-3">
+                            <label className="form-label">Estado</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                name="endereco.estado"
+                                value={cliente.endereco.estado}
                                 onChange={handleChange}
                             />
                         </div>
 
                         <div className="mb-3">
-                            <label className="form-label">Observações</label>
+                            <label className="form-label">Cidade</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                name="endereco.cidade"
+                                value={cliente.endereco.cidade}
+                                onChange={handleChange}
+                            />
+                        </div>
+
+                        <div className="mb-3">
+                            <label className="form-label">Bairro</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                name="endereco.bairro"
+                                value={cliente.endereco.bairro}
+                                onChange={handleChange}
+                            />
+                        </div>
+
+                        <div className="mb-3">
+                            <label className="form-label">Rua</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                name="endereco.rua"
+                                value={cliente.endereco.rua}
+                                onChange={handleChange}
+                            />
+                        </div>
+
+                        <div className="mb-3">
+                            <label className="form-label">Número</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                name="endereco.numero"
+                                value={cliente.endereco.numero}
+                                onChange={handleChange}
+                            />
+                        </div>
+
+                        <div className="mb-3">
+                            <label className="form-label">Código Postal</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                name="endereco.codigoPostal"
+                                value={cliente.endereco.codigoPostal}
+                                onChange={handleChange}
+                            />
+                        </div>
+
+                        <div className="mb-3">
+                            <label className="form-label">Informações Adicionais</label>
                             <textarea
                                 className="form-control"
-                                name="observacoes"
-                                value={cliente.observacoes}
+                                name="endereco.informacoesAdicionais"
+                                value={cliente.endereco.informacoesAdicionais}
                                 onChange={handleChange}
-                                rows={3}
                             />
                         </div>
 
@@ -188,4 +285,4 @@ export default function ClienteForm() {
             </div>
         </div>
     );
-} 
+}
