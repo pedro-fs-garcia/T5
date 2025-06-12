@@ -56,13 +56,6 @@ export default function HomePage() {
                                         <i className="bi bi-arrow-right ms-auto opacity-50"></i>
                                     </button>
                                 </a>
-                                <a href="/fornecedores" className="text-decoration-none">
-                                    <button className="btn btn-outline-primary w-100 text-start d-flex align-items-center">
-                                        <i className="bi bi-truck me-2"></i>
-                                        <span>Fornecedores</span>
-                                        <i className="bi bi-arrow-right ms-auto opacity-50"></i>
-                                    </button>
-                                </a>
                             </div>
                             <div className="card-footer bg-white border-top-0">
                                 <p className="text-muted small">Acesse e gerencie todos os cadastros do sistema</p>
@@ -108,13 +101,6 @@ export default function HomePage() {
                                         <i className="bi bi-arrow-right ms-auto opacity-50"></i>
                                     </button>
                                 </a>
-                                <a href="/fornecedores/novo" className="text-decoration-none">
-                                    <button className="btn btn-outline-primary w-100 text-start d-flex align-items-center">
-                                        <i className="bi bi-truck me-2"></i>
-                                        <span>Novo Fornecedor</span>
-                                        <i className="bi bi-arrow-right ms-auto opacity-50"></i>
-                                    </button>
-                                </a>
                             </div>
                             <div className="card-footer bg-white border-top-0">
                                 <p className="text-muted small">Acesse e gerencie todos os cadastros do sistema</p>
@@ -133,20 +119,6 @@ export default function HomePage() {
                                 <p className="card-text text-muted">Registre compras e vendas do seu petshop</p>
                             </div>
                             <div className="card-body d-grid gap-3">
-                                <a href="/compras" className="text-decoration-none">
-                                    <button className="btn btn-outline-success w-100 text-start d-flex align-items-center">
-                                        <i className="bi bi-receipt me-2"></i>
-                                        <span>Listagem de Compras</span>
-                                        <i className="bi bi-arrow-right ms-auto opacity-50"></i>
-                                    </button>
-                                </a>
-                                <a href="/compras/novo" className="text-decoration-none">
-                                    <button className="btn btn-outline-success w-100 text-start d-flex align-items-center">
-                                        <i className="bi bi-cart me-2"></i>
-                                        <span>Registro de Compra</span>
-                                        <i className="bi bi-arrow-right ms-auto opacity-50"></i>
-                                    </button>
-                                </a>
                                 <a href="/vendas" className="text-decoration-none">
                                     <button className="btn btn-outline-success w-100 text-start d-flex align-items-center">
                                         <i className="bi bi-receipt me-2"></i>
