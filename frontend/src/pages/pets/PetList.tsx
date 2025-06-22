@@ -1,41 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-
-interface PetData {
-    id: number;
-    nome: string;
-    especie: string;
-    raca: string;
-    idade: number;
-    peso: number;
-    clienteId: number;
-    clienteNome: string;
-    observacoes: string;
-}
+import { usePets, useDeletePet } from '../../hooks';
 
 export default function PetList() {
-    const [pets, setPets] = useState<PetData[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [mensagem, setMensagem] = useState('');
     const [busca, setBusca] = useState('');
+    const { data: pets, loading, error, execute: fetchPets } = usePets();
+    const { execute: deletePet } = useDeletePet();
 
     useEffect(() => {
-        fetch('/pets.json')
-            .then((res) => {
-                if (!res.ok) throw new Error('Erro ao buscar os dados dos pets');
-                return res.json();
-            })
-            .then((data: PetData[]) => setPets(data))
-            .catch((err) => setMensagem(`Erro: ${err.message}`))
-            .finally(() => setLoading(false));
-    }, []);
+        fetchPets();
+    }, [fetchPets]);
 
-    const petsFiltrados = pets.filter(pet => 
+    const petsFiltrados = pets?.filter(pet => 
         pet.nome.toLowerCase().includes(busca.toLowerCase()) ||
-        pet.especie.toLowerCase().includes(busca.toLowerCase()) ||
         pet.raca.toLowerCase().includes(busca.toLowerCase()) ||
-        pet.clienteNome.toLowerCase().includes(busca.toLowerCase())
-    );
+        pet.tipo.toLowerCase().includes(busca.toLowerCase())
+    ) || [];
+
+    const handleDelete = async (id: number) => {
+        const confirmacao = window.confirm("Tem certeza que deseja excluir este pet?");
+        if (!confirmacao) return;
+
+        await deletePet(id);
+        fetchPets(); // Recarregar lista após exclusão
+    };
 
     if (loading) {
         return (
@@ -44,6 +32,16 @@ export default function PetList() {
                     <div className="spinner-border" role="status">
                         <span className="visually-hidden">Carregando...</span>
                     </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="container py-4">
+                <div className="alert alert-danger">
+                    Erro ao carregar pets: {error}
                 </div>
             </div>
         );
@@ -59,12 +57,6 @@ export default function PetList() {
                 </Link>
             </div>
 
-            {mensagem && (
-                <div className="alert alert-warning" role="alert">
-                    {mensagem}
-                </div>
-            )}
-
             <div className="card shadow-sm mb-4">
                 <div className="card-body">
                     <div className="input-group">
@@ -74,7 +66,7 @@ export default function PetList() {
                         <input
                             type="text"
                             className="form-control"
-                            placeholder="Buscar por nome, espécie, raça ou dono..."
+                            placeholder="Buscar por nome, raça ou tipo..."
                             value={busca}
                             onChange={(e) => setBusca(e.target.value)}
                         />
@@ -91,34 +83,33 @@ export default function PetList() {
                             </div>
                             <div className="card-body">
                                 <p className="card-text">
-                                    <strong>Espécie:</strong> {pet.especie}
-                                </p>
-                                <p className="card-text">
                                     <strong>Raça:</strong> {pet.raca}
                                 </p>
                                 <p className="card-text">
-                                    <strong>Idade:</strong> {pet.idade} anos
+                                    <strong>Tipo:</strong> {pet.tipo}
                                 </p>
                                 <p className="card-text">
-                                    <strong>Peso:</strong> {pet.peso} kg
+                                    <strong>Gênero:</strong> {pet.genero === 'M' ? 'Macho' : 'Fêmea'}
                                 </p>
                                 <p className="card-text">
-                                    <strong>Dono:</strong> {pet.clienteNome}
+                                    <strong>ID do Cliente:</strong> {pet.cliente_id}
                                 </p>
-                                {pet.observacoes && (
-                                    <p className="card-text">
-                                        <strong>Observações:</strong> {pet.observacoes}
-                                    </p>
-                                )}
                             </div>
                             <div className="card-footer bg-transparent">
                                 <Link
                                     to={`/pets/${pet.id}`}
-                                    className="btn btn-outline-primary w-100"
+                                    className="btn btn-outline-primary w-100 mb-2"
                                 >
                                     <i className="bi bi-eye me-2"></i>
                                     Ver Detalhes
                                 </Link>
+                                <button
+                                    onClick={() => handleDelete(pet.id)}
+                                    className="btn btn-outline-danger w-100"
+                                >
+                                    <i className="bi bi-trash me-2"></i>
+                                    Excluir
+                                </button>
                             </div>
                         </div>
                     </div>

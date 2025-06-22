@@ -1,70 +1,39 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { buscaListaClientes, excluirCliente } from '../../services/ClienteService';
-import { ListaClientes } from '../../models/interfaces';
-
-
+import { useClientes, useDeleteCliente } from '../../hooks';
 
 export default function ClienteList() {
-    const [clientes, setClientes] = useState<ListaClientes>([]);
     const [busca, setBusca] = useState("");
-    const [loading, setLoading] = useState(true);
+    const { data: clientes, loading, error, execute: fetchClientes } = useClientes();
+    const { execute: deleteCliente } = useDeleteCliente();
 
     useEffect(() => {
-        const buscaClientes = async () => {
-            setLoading(true);
-            try {
-                const dados = await buscaListaClientes();
-                setClientes(dados);
-                console.log(dados);
-            } catch (error) {
-                console.error("Erro ao buscar clientes:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        buscaClientes();
-    }, []);
+        fetchClientes();
+    }, [fetchClientes]);
 
     const normalizaTexto = (texto: string) => texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-    const clientesFiltrados = clientes.filter((cliente) => {
+    const clientesFiltrados = clientes?.filter((cliente) => {
         const buscaLower = normalizaTexto(busca);
 
         const nome = normalizaTexto(cliente.nome ?? "");
-        const nomeSocial = normalizaTexto(cliente.nomeSocial ?? "");
+        const nomeSocial = normalizaTexto(cliente.nome_social ?? "");
         const email = normalizaTexto(cliente.email ?? "");
-        const telefones = cliente.telefones.map(t => normalizaTexto(t.numero)).join(" ");
-        const endereco = cliente.endereco
-            ? normalizaTexto(
-                `${cliente.endereco.rua} ${cliente.endereco.numero} ${cliente.endereco.bairro} ${cliente.endereco.cidade} ${cliente.endereco.estado} ${cliente.endereco.codigoPostal}`
-            )
-            : "";
 
         return (
             nome.includes(buscaLower) ||
             nomeSocial.includes(buscaLower) ||
-            email.includes(buscaLower) ||
-            telefones.includes(buscaLower) ||
-            endereco.includes(buscaLower)
+            email.includes(buscaLower)
         );
-    });
+    }) || [];
 
+    const deletarCliente = async (id: number) => {
+        const confirmacao = window.confirm("Tem certeza que deseja excluir este cliente?");
+        if (!confirmacao) return;
 
-    const deletarCliente = async (id:number) => {
-            const confirmacao = window.confirm("Tem certeza que deseja excluir este cliente?");
-            if (!confirmacao) return;
-
-            const resultado = await excluirCliente(id);
-
-            if (resultado) {
-                window.location.reload(); // recarrega a página após exclusão
-            } else {
-                alert("Erro ao excluir cliente.");
-            }
-    }
-
+        await deleteCliente(id);
+        fetchClientes(); // Recarregar lista após exclusão
+    };
 
     if (loading) {
         return (
@@ -73,6 +42,16 @@ export default function ClienteList() {
                     <div className="spinner-border" role="status">
                         <span className="visually-hidden">Carregando...</span>
                     </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="container py-4">
+                <div className="alert alert-danger">
+                    Erro ao carregar clientes: {error}
                 </div>
             </div>
         );
@@ -89,7 +68,7 @@ export default function ClienteList() {
                         <input
                             type="text"
                             className="form-control"
-                            placeholder="Buscar por nome, nome social, telefone, e-mail ou endereço..."
+                            placeholder="Buscar por nome, nome social ou e-mail..."
                             value={busca}
                             onChange={(e) => setBusca(e.target.value)}
                         />
@@ -106,39 +85,18 @@ export default function ClienteList() {
                     <div key={cliente.id} className="col">
                         <div className="card h-100 shadow-sm">
                             <div className="card-header bg-success text-white">
-                                <h5 className="card-title mb-0">{cliente.nome ?? "Nome não informado"}</h5>
+                                <h5 className="card-title mb-0">{cliente.id} - {cliente.nome}</h5>
                             </div>
                             <div className="card-body">
                                 <p className="card-text">
-                                    <strong>Nome Social:</strong> {cliente.nomeSocial ?? "Não informado"}
+                                    <strong>Nome Social:</strong> {cliente.nome_social || "Não informado"}
                                 </p>
                                 <p className="card-text">
-                                    <strong>E-mail:</strong> {cliente.email ?? "Não informado"}
+                                    <strong>E-mail:</strong> {cliente.email}
                                 </p>
                                 <p className="card-text">
-                                    <strong>Telefone(s):</strong><br />
-                                    {cliente.telefones && cliente.telefones.length > 0 ? (
-                                        cliente.telefones.map((tel) => (
-                                            <span key={tel.id}>
-                                                ({tel.ddd}) {tel.numero}
-                                                <br />
-                                            </span>
-                                        ))
-                                    ) : (
-                                        "Nenhum telefone cadastrado"
-                                    )}
+                                    <strong>Data de Cadastro:</strong> {new Date(cliente.data_cadastro).toLocaleDateString('pt-BR')}
                                 </p>
-                                <p className="card-text">
-                                    <strong>Endereço:</strong><br />
-                                    {cliente.endereco
-                                        ? `${cliente.endereco.rua}, ${cliente.endereco.numero} - ${cliente.endereco.bairro}, ${cliente.endereco.cidade} - ${cliente.endereco.estado}, CEP: ${cliente.endereco.codigoPostal}`
-                                        : "Endereço não informado"}
-                                </p>
-                                {cliente.endereco?.informacoesAdicionais && (
-                                    <p className="card-text">
-                                        <strong>Complemento:</strong> {cliente.endereco.informacoesAdicionais}
-                                    </p>
-                                )}
                             </div>
                             <div className="card-footer bg-transparent">
                                 <Link to={`/clientes/${cliente.id}`} className="btn btn-outline-primary w-100">

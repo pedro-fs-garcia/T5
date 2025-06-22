@@ -1,7 +1,7 @@
 
 async function buscarInfo(rota: string) {
     try {
-        const url = `http://localhost:32831${rota}`
+        const url = `http://localhost:3001${rota}`
         const resposta = await fetch(url.toString(), {
             method: "GET",
             headers: {
@@ -20,7 +20,7 @@ async function buscarInfo(rota: string) {
 }
 
 export async function buscaListaClientes() {
-    return buscarInfo("/cliente/clientes");
+    return buscarInfo("/clientes");
 }
 
 export async function buscarClientePorId(id: number) {
@@ -29,7 +29,7 @@ export async function buscarClientePorId(id: number) {
 
 export async function registrarNovoCliente(cliente: any) {
     try {
-        const url = `http://localhost:32831/cliente/cadastrar`
+        const url = `http://localhost:3001/cliente/cadastrar`
         const resposta = await fetch(url.toString(), {
             method: "POST",
             headers: {
@@ -54,7 +54,7 @@ export async function excluirCliente(id: number): Promise<Response> {
         id: id
     };
 
-    const response = await fetch('http://localhost:32831/cliente/excluir', {
+    const response = await fetch('http://localhost:3001/cliente/excluir', {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ export async function excluirCliente(id: number): Promise<Response> {
 
 
 export async function atualizarCliente(clienteAtualizado: any): Promise<Response> {
-    const response = await fetch('http://localhost:32831/cliente/atualizar', {
+    const response = await fetch('http://localhost:3001/cliente/atualizar', {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',

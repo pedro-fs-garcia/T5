@@ -1,32 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-
-interface ServicoData {
-    id: number;
-    nome: string;
-    preco: number;
-    descricao: string;
-    duracao: string;
-    categoria: string;
-}
+import { useServicos, useDeleteServico } from '../../hooks';
+import { formatCurrency } from '../../utils/apiUtils';
 
 export default function ServicosList() {
-    const [servicos, setServicos] = useState<ServicoData[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [mensagem, setMensagem] = useState('');
+    const [busca, setBusca] = useState('');
+    const { data: servicos, loading, error, execute: fetchServicos } = useServicos();
+    const { execute: deleteServico } = useDeleteServico();
 
     useEffect(() => {
-        fetch('/servicos.json')
-            .then((res) => {
-                if (!res.ok) throw new Error('Erro ao buscar os serviços');
-                return res.json();
-            })
-            .then((data: ServicoData[]) => {
-                setServicos(data);
-            })
-            .catch((err) => setMensagem(`Erro: ${err.message}`))
-            .finally(() => setLoading(false));
-    }, []);
+        fetchServicos();
+    }, [fetchServicos]);
+
+    const servicosFiltrados = servicos?.filter(servico => 
+        servico.nome.toLowerCase().includes(busca.toLowerCase()) ||
+        (servico.descricao && servico.descricao.toLowerCase().includes(busca.toLowerCase()))
+    ) || [];
+
+    const handleDelete = async (id: number) => {
+        const confirmacao = window.confirm("Tem certeza que deseja excluir este serviço?");
+        if (!confirmacao) return;
+
+        await deleteServico(id);
+        fetchServicos(); // Recarregar lista após exclusão
+    };
 
     if (loading) {
         return (
@@ -40,11 +37,11 @@ export default function ServicosList() {
         );
     }
 
-    if (mensagem) {
+    if (error) {
         return (
             <div className="container py-4">
-                <div className="alert alert-danger" role="alert">
-                    {mensagem}
+                <div className="alert alert-danger">
+                    Erro ao carregar serviços: {error}
                 </div>
             </div>
         );
@@ -60,35 +57,49 @@ export default function ServicosList() {
                 </Link>
             </div>
 
+            <div className="card shadow-sm mb-4">
+                <div className="card-body">
+                    <div className="input-group">
+                        <span className="input-group-text">
+                            <i className="bi bi-search"></i>
+                        </span>
+                        <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Buscar por nome ou descrição..."
+                            value={busca}
+                            onChange={(e) => setBusca(e.target.value)}
+                        />
+                    </div>
+                </div>
+            </div>
+
             <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                {servicos.map((servico) => (
+                {servicosFiltrados.map((servico) => (
                     <div key={servico.id} className="col">
                         <div className="card h-100 shadow-sm">
                             <div className="card-header bg-success text-white">
-                                <div className="d-flex justify-content-between align-items-center">
-                                    <h5 className="mb-0">{servico.nome}</h5>
-                                    <span className="badge bg-light text-dark">
-                                        {servico.categoria}
-                                    </span>
-                                </div>
+                                <h5 className="mb-0">{servico.nome}</h5>
                             </div>
                             <div className="card-body">
-                                <p className="card-text text-muted mb-3">
-                                    {servico.descricao}
-                                </p>
+                                {servico.descricao && (
+                                    <p className="card-text text-muted mb-3">
+                                        {servico.descricao}
+                                    </p>
+                                )}
                                 <div className="mb-3">
                                     <small className="text-muted d-block">
-                                        Duração: {servico.duracao}
+                                        Duração: {servico.duracao_minutos} minutos
                                     </small>
                                 </div>
                                 <div className="d-flex justify-content-between align-items-center">
                                     <span className="h5 mb-0">
-                                        R$ {servico.preco.toFixed(2)}
+                                        {formatCurrency(servico.preco)}
                                     </span>
                                 </div>
                             </div>
                             <div className="card-footer bg-white border-top-0">
-                                <div className="d-flex justify-content-between">
+                                <div className="d-flex flex-column gap-2">
                                     <Link
                                         to={`/servicos/${servico.id}`}
                                         className="btn btn-outline-success btn-sm"
@@ -103,12 +114,25 @@ export default function ServicosList() {
                                         <i className="bi bi-pencil me-1"></i>
                                         Editar
                                     </Link>
+                                    <button
+                                        onClick={() => handleDelete(servico.id)}
+                                        className="btn btn-outline-danger btn-sm"
+                                    >
+                                        <i className="bi bi-trash me-1"></i>
+                                        Excluir
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
+
+            {servicosFiltrados.length === 0 && (
+                <div className="alert alert-info" role="alert">
+                    Nenhum serviço encontrado com os critérios de busca.
+                </div>
+            )}
         </div>
     );
 } 

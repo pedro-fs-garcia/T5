@@ -2,7 +2,7 @@ export const createDatabase = `CREATE DATABASE IF NOT EXISTS c4p;`
 
 export const createTables = `
 -- Tabela de Clientes
-CREATE TABLE clientes (
+CREATE TABLE IF NOT EXISTS clientes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     nome_social VARCHAR(100),
@@ -12,7 +12,7 @@ CREATE TABLE clientes (
 ) ENGINE=InnoDB;
 
 -- Tabela de Documentos dos Clientes (CPF/RG)
-CREATE TABLE documentos_cliente (
+CREATE TABLE IF NOT EXISTS documentos_cliente (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cliente_id INT NOT NULL,
     tipo ENUM('CPF', 'RG') NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE documentos_cliente (
 ) ENGINE=InnoDB;
 
 -- Tabela de Telefones
-CREATE TABLE telefones (
+CREATE TABLE IF NOT EXISTS telefones (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cliente_id INT NOT NULL,
     ddd VARCHAR(2) NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE telefones (
 ) ENGINE=InnoDB;
 
 -- Tabela de Endereços
-CREATE TABLE enderecos (
+CREATE TABLE IF NOT EXISTS enderecos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cliente_id INT NOT NULL,
     estado VARCHAR(2) NOT NULL,
@@ -48,18 +48,18 @@ CREATE TABLE enderecos (
 ) ENGINE=InnoDB;
 
 -- Tabela de Pets
-CREATE TABLE pets (
+CREATE TABLE IF NOT EXISTS pets (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cliente_id INT NOT NULL,
     nome VARCHAR(50) NOT NULL,
     raca VARCHAR(50) NOT NULL,
     genero ENUM("M", "F") NOT NULL,
     tipo VARCHAR(50) NOT NULL,
-    FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE,
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- Tabela de Serviços
-CREATE TABLE servicos (
+CREATE TABLE IF NOT EXISTS servicos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(50) NOT NULL,
     descricao TEXT,
@@ -68,7 +68,7 @@ CREATE TABLE servicos (
 ) ENGINE=InnoDB;
 
 -- Tabela de Produtos
-CREATE TABLE produtos (
+CREATE TABLE IF NOT EXISTS produtos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(50) NOT NULL,
     descricao TEXT,
@@ -77,7 +77,7 @@ CREATE TABLE produtos (
 ) ENGINE=InnoDB;
 
 -- Tabela de Relacionamento Cliente-Serviços (histórico)
-CREATE TABLE cliente_servicos (
+CREATE TABLE IF NOT EXISTS cliente_servicos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cliente_id INT NOT NULL,
     servico_id INT NOT NULL,
@@ -91,7 +91,7 @@ CREATE TABLE cliente_servicos (
 ) ENGINE=InnoDB;
 
 -- Tabela de Relacionamento Cliente-Produtos (compras)
-CREATE TABLE cliente_produtos (
+CREATE TABLE IF NOT EXISTS cliente_produtos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cliente_id INT NOT NULL,
     produto_id INT NOT NULL,
