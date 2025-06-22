@@ -573,6 +573,593 @@ DELETE /produtos/:id
 }
 ```
 
+### Documentos
+
+#### Criar Documento
+```http
+POST /documentos
+```
+**Corpo da Requisição:**
+```json
+{
+    "cliente_id": "number",
+    "tipo": "CPF" | "RG",
+    "valor": "string",
+    "data_emissao": "date"
+}
+```
+**Resposta (201 Created):**
+```json
+{
+    "success": true,
+    "data": {
+        "id": "number",
+        "cliente_id": "number",
+        "tipo": "CPF" | "RG",
+        "valor": "string",
+        "data_emissao": "date"
+    },
+    "message": "Documento criado com sucesso"
+}
+```
+
+#### Listar Todos os Documentos
+```http
+GET /documentos
+```
+**Resposta (200 OK):**
+```json
+{
+    "success": true,
+    "data": [
+        {
+            "id": "number",
+            "cliente_id": "number",
+            "tipo": "CPF" | "RG",
+            "valor": "string",
+            "data_emissao": "date"
+        }
+    ]
+}
+```
+
+#### Buscar Documento por ID
+```http
+GET /documentos/:id
+```
+**Resposta (200 OK):**
+```json
+{
+    "success": true,
+    "data": {
+        "id": "number",
+        "cliente_id": "number",
+        "tipo": "CPF" | "RG",
+        "valor": "string",
+        "data_emissao": "date"
+    }
+}
+```
+
+#### Atualizar Documento
+```http
+PUT /documentos/:id
+```
+**Corpo da Requisição:**
+```json
+{
+    "tipo": "CPF" | "RG", // opcional
+    "valor": "string", // opcional
+    "data_emissao": "date" // opcional
+}
+```
+**Resposta (200 OK):**
+```json
+{
+    "success": true,
+    "data": {
+        "id": "number",
+        "cliente_id": "number",
+        "tipo": "CPF" | "RG",
+        "valor": "string",
+        "data_emissao": "date"
+    },
+    "message": "Documento atualizado com sucesso"
+}
+```
+
+#### Excluir Documento
+```http
+DELETE /documentos/:id
+```
+**Resposta (200 OK):**
+```json
+{
+    "success": true,
+    "message": "Documento excluído com sucesso"
+}
+```
+
+### Telefones
+
+#### Criar Telefone
+```http
+POST /telefones
+```
+**Corpo da Requisição:**
+```json
+{
+    "cliente_id": "number",
+    "ddd": "string",
+    "numero": "string"
+}
+```
+**Resposta (201 Created):**
+```json
+{
+    "success": true,
+    "data": {
+        "id": "number",
+        "cliente_id": "number",
+        "ddd": "string",
+        "numero": "string"
+    },
+    "message": "Telefone criado com sucesso"
+}
+```
+
+#### Listar Todos os Telefones
+```http
+GET /telefones
+```
+**Resposta (200 OK):**
+```json
+{
+    "success": true,
+    "data": [
+        {
+            "id": "number",
+            "cliente_id": "number",
+            "ddd": "string",
+            "numero": "string"
+        }
+    ]
+}
+```
+
+#### Buscar Telefone por ID
+```http
+GET /telefones/:id
+```
+**Resposta (200 OK):**
+```json
+{
+    "success": true,
+    "data": {
+        "id": "number",
+        "cliente_id": "number",
+        "ddd": "string",
+        "numero": "string"
+    }
+}
+```
+
+#### Atualizar Telefone
+```http
+PUT /telefones/:id
+```
+**Corpo da Requisição:**
+```json
+{
+    "ddd": "string", // opcional
+    "numero": "string" // opcional
+}
+```
+**Resposta (200 OK):**
+```json
+{
+    "success": true,
+    "data": {
+        "id": "number",
+        "cliente_id": "number",
+        "ddd": "string",
+        "numero": "string"
+    },
+    "message": "Telefone atualizado com sucesso"
+}
+```
+
+#### Excluir Telefone
+```http
+DELETE /telefones/:id
+```
+**Resposta (200 OK):**
+```json
+{
+    "success": true,
+    "message": "Telefone excluído com sucesso"
+}
+```
+
+### Endereços
+
+#### Criar Endereço
+```http
+POST /enderecos
+```
+**Corpo da Requisição:**
+```json
+{
+    "cliente_id": "number",
+    "estado": "string",
+    "cidade": "string",
+    "bairro": "string",
+    "rua": "string",
+    "numero": "string",
+    "complemento": "string",
+    "cep": "string"
+}
+```
+**Resposta (201 Created):**
+```json
+{
+    "success": true,
+    "data": {
+        "id": "number",
+        "cliente_id": "number",
+        "estado": "string",
+        "cidade": "string",
+        "bairro": "string",
+        "rua": "string",
+        "numero": "string",
+        "complemento": "string",
+        "cep": "string"
+    },
+    "message": "Endereço criado com sucesso"
+}
+```
+
+#### Listar Todos os Endereços
+```http
+GET /enderecos
+```
+**Resposta (200 OK):**
+```json
+{
+    "success": true,
+    "data": [
+        {
+            "id": "number",
+            "cliente_id": "number",
+            "estado": "string",
+            "cidade": "string",
+            "bairro": "string",
+            "rua": "string",
+            "numero": "string",
+            "complemento": "string",
+            "cep": "string"
+        }
+    ]
+}
+```
+
+#### Buscar Endereço por ID
+```http
+GET /enderecos/:id
+```
+**Resposta (200 OK):**
+```json
+{
+    "success": true,
+    "data": {
+        "id": "number",
+        "cliente_id": "number",
+        "estado": "string",
+        "cidade": "string",
+        "bairro": "string",
+        "rua": "string",
+        "numero": "string",
+        "complemento": "string",
+        "cep": "string"
+    }
+}
+```
+
+#### Atualizar Endereço
+```http
+PUT /enderecos/:id
+```
+**Corpo da Requisição:**
+```json
+{
+    "estado": "string", // opcional
+    "cidade": "string", // opcional
+    "bairro": "string", // opcional
+    "rua": "string", // opcional
+    "numero": "string", // opcional
+    "complemento": "string", // opcional
+    "cep": "string" // opcional
+}
+```
+**Resposta (200 OK):**
+```json
+{
+    "success": true,
+    "data": {
+        "id": "number",
+        "cliente_id": "number",
+        "estado": "string",
+        "cidade": "string",
+        "bairro": "string",
+        "rua": "string",
+        "numero": "string",
+        "complemento": "string",
+        "cep": "string"
+    },
+    "message": "Endereço atualizado com sucesso"
+}
+```
+
+#### Excluir Endereço
+```http
+DELETE /enderecos/:id
+```
+**Resposta (200 OK):**
+```json
+{
+    "success": true,
+    "message": "Endereço excluído com sucesso"
+}
+```
+
+### Cliente-Serviços
+
+#### Registrar Serviço Realizado
+```http
+POST /cliente-servicos
+```
+**Corpo da Requisição:**
+```json
+{
+    "cliente_id": "number",
+    "servico_id": "number",
+    "data_realizacao": "date",
+    "valor_unitario": "number",
+    "desconto": "number",
+    "valor_total": "number",
+    "observacoes": "string"
+}
+```
+**Resposta (201 Created):**
+```json
+{
+    "success": true,
+    "data": {
+        "id": "number",
+        "cliente_id": "number",
+        "servico_id": "number",
+        "data_realizacao": "date",
+        "valor_unitario": "number",
+        "desconto": "number",
+        "valor_total": "number",
+        "observacoes": "string"
+    },
+    "message": "Serviço registrado com sucesso"
+}
+```
+
+#### Listar Todos os Serviços Realizados
+```http
+GET /cliente-servicos
+```
+**Resposta (200 OK):**
+```json
+{
+    "success": true,
+    "data": [
+        {
+            "id": "number",
+            "cliente_id": "number",
+            "servico_id": "number",
+            "data_realizacao": "date",
+            "valor_unitario": "number",
+            "desconto": "number",
+            "valor_total": "number",
+            "observacoes": "string"
+        }
+    ]
+}
+```
+
+#### Buscar Serviço Realizado por ID
+```http
+GET /cliente-servicos/:id
+```
+**Resposta (200 OK):**
+```json
+{
+    "success": true,
+    "data": {
+        "id": "number",
+        "cliente_id": "number",
+        "servico_id": "number",
+        "data_realizacao": "date",
+        "valor_unitario": "number",
+        "desconto": "number",
+        "valor_total": "number",
+        "observacoes": "string"
+    }
+}
+```
+
+#### Atualizar Serviço Realizado
+```http
+PUT /cliente-servicos/:id
+```
+**Corpo da Requisição:**
+```json
+{
+    "data_realizacao": "date", // opcional
+    "valor_unitario": "number", // opcional
+    "desconto": "number", // opcional
+    "valor_total": "number", // opcional
+    "observacoes": "string" // opcional
+}
+```
+**Resposta (200 OK):**
+```json
+{
+    "success": true,
+    "data": {
+        "id": "number",
+        "cliente_id": "number",
+        "servico_id": "number",
+        "data_realizacao": "date",
+        "valor_unitario": "number",
+        "desconto": "number",
+        "valor_total": "number",
+        "observacoes": "string"
+    },
+    "message": "Serviço atualizado com sucesso"
+}
+```
+
+#### Excluir Serviço Realizado
+```http
+DELETE /cliente-servicos/:id
+```
+**Resposta (200 OK):**
+```json
+{
+    "success": true,
+    "message": "Serviço excluído com sucesso"
+}
+```
+
+### Cliente-Produtos
+
+#### Registrar Compra de Produto
+```http
+POST /cliente-produtos
+```
+**Corpo da Requisição:**
+```json
+{
+    "cliente_id": "number",
+    "produto_id": "number",
+    "quantidade": "number",
+    "data_compra": "date",
+    "valor_unitario": "number",
+    "desconto": "number",
+    "valor_total": "number"
+}
+```
+**Resposta (201 Created):**
+```json
+{
+    "success": true,
+    "data": {
+        "id": "number",
+        "cliente_id": "number",
+        "produto_id": "number",
+        "quantidade": "number",
+        "data_compra": "date",
+        "valor_unitario": "number",
+        "desconto": "number",
+        "valor_total": "number"
+    },
+    "message": "Compra registrada com sucesso"
+}
+```
+
+#### Listar Todas as Compras
+```http
+GET /cliente-produtos
+```
+**Resposta (200 OK):**
+```json
+{
+    "success": true,
+    "data": [
+        {
+            "id": "number",
+            "cliente_id": "number",
+            "produto_id": "number",
+            "quantidade": "number",
+            "data_compra": "date",
+            "valor_unitario": "number",
+            "desconto": "number",
+            "valor_total": "number"
+        }
+    ]
+}
+```
+
+#### Buscar Compra por ID
+```http
+GET /cliente-produtos/:id
+```
+**Resposta (200 OK):**
+```json
+{
+    "success": true,
+    "data": {
+        "id": "number",
+        "cliente_id": "number",
+        "produto_id": "number",
+        "quantidade": "number",
+        "data_compra": "date",
+        "valor_unitario": "number",
+        "desconto": "number",
+        "valor_total": "number"
+    }
+}
+```
+
+#### Atualizar Compra
+```http
+PUT /cliente-produtos/:id
+```
+**Corpo da Requisição:**
+```json
+{
+    "quantidade": "number", // opcional
+    "data_compra": "date", // opcional
+    "valor_unitario": "number", // opcional
+    "desconto": "number", // opcional
+    "valor_total": "number" // opcional
+}
+```
+**Resposta (200 OK):**
+```json
+{
+    "success": true,
+    "data": {
+        "id": "number",
+        "cliente_id": "number",
+        "produto_id": "number",
+        "quantidade": "number",
+        "data_compra": "date",
+        "valor_unitario": "number",
+        "desconto": "number",
+        "valor_total": "number"
+    },
+    "message": "Compra atualizada com sucesso"
+}
+```
+
+#### Excluir Compra
+```http
+DELETE /cliente-produtos/:id
+```
+**Resposta (200 OK):**
+```json
+{
+    "success": true,
+    "message": "Compra deletada com sucesso"
+}
+```
+
 ## Códigos de Status HTTP
 
 - 200: Sucesso

@@ -3,12 +3,22 @@ import { ClienteController } from '../controllers/clienteController';
 import { PetController } from '../controllers/petController';
 import { ServicoController } from '../controllers/servicoController';
 import { ProdutoController } from '../controllers/produtoController';
+import { DocumentoController } from '../controllers/documentoController';
+import { TelefoneController } from '../controllers/telefoneController';
+import { EnderecoController } from '../controllers/enderecoController';
+import { ClienteServicoController } from '../controllers/clienteServicoController';
+import { ClienteProdutoController } from '../controllers/clienteProdutoController';
 
 const router = Router();
 const clienteController = new ClienteController();
 const petController = new PetController();
 const servicoController = new ServicoController();
 const produtoController = new ProdutoController();
+const documentoController = new DocumentoController();
+const telefoneController = new TelefoneController();
+const enderecoController = new EnderecoController();
+const clienteServicoController = new ClienteServicoController();
+const clienteProdutoController = new ClienteProdutoController();
 
 // Cliente routes
 router.post('/clientes', (req: Request, res: Response) => clienteController.create(req, res));
@@ -39,5 +49,40 @@ router.get('/produtos/:id', (req: Request, res: Response) => produtoController.g
 router.put('/produtos/:id', (req: Request, res: Response) => produtoController.update(req, res));
 router.delete('/produtos/:id', (req: Request, res: Response) => produtoController.delete(req, res));
 router.patch('/produtos/:id/estoque', (req: Request, res: Response) => produtoController.updateEstoque(req, res));
+
+// Documento routes
+router.post('/documentos', (req: Request, res: Response) => documentoController.create(req, res));
+router.get('/documentos', (req: Request, res: Response) => documentoController.getAll(req, res));
+router.get('/documentos/:id', (req: Request, res: Response) => documentoController.getById(req, res));
+router.put('/documentos/:id', (req: Request, res: Response) => documentoController.update(req, res));
+router.delete('/documentos/:id', (req: Request, res: Response) => documentoController.delete(req, res));
+
+// Telefone routes
+router.post('/telefones', (req: Request, res: Response) => telefoneController.create(req, res));
+router.get('/telefones', (req: Request, res: Response) => telefoneController.getAll(req, res));
+router.get('/telefones/:id', (req: Request, res: Response) => telefoneController.getById(req, res));
+router.put('/telefones/:id', (req: Request, res: Response) => telefoneController.update(req, res));
+router.delete('/telefones/:id', (req: Request, res: Response) => telefoneController.delete(req, res));
+
+// Endereco routes
+router.post('/enderecos', (req: Request, res: Response) => enderecoController.create(req, res));
+router.get('/enderecos', (req: Request, res: Response) => enderecoController.getAll(req, res));
+router.get('/enderecos/:id', (req: Request, res: Response) => enderecoController.getById(req, res));
+router.put('/enderecos/:id', (req: Request, res: Response) => enderecoController.update(req, res));
+router.delete('/enderecos/:id', (req: Request, res: Response) => enderecoController.delete(req, res));
+
+// ClienteServico routes
+router.post('/cliente-servicos', (req: Request, res: Response) => clienteServicoController.create(req, res));
+router.get('/cliente-servicos', (req: Request, res: Response) => clienteServicoController.getAll(req, res));
+router.get('/cliente-servicos/:id', (req: Request, res: Response) => clienteServicoController.getById(req, res));
+router.put('/cliente-servicos/:id', (req: Request, res: Response) => clienteServicoController.update(req, res));
+router.delete('/cliente-servicos/:id', (req: Request, res: Response) => clienteServicoController.delete(req, res));
+
+// ClienteProduto routes
+router.post('/cliente-produtos', (req: Request, res: Response) => clienteProdutoController.create(req, res));
+router.get('/cliente-produtos', (req: Request, res: Response) => clienteProdutoController.getAll(req, res));
+router.get('/cliente-produtos/:id', (req: Request, res: Response) => clienteProdutoController.getById(req, res));
+router.put('/cliente-produtos/:id', (req: Request, res: Response) => clienteProdutoController.update(req, res));
+router.delete('/cliente-produtos/:id', (req: Request, res: Response) => clienteProdutoController.delete(req, res));
 
 export default router; 
