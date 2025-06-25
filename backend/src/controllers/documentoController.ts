@@ -1,24 +1,74 @@
 import { Request, Response } from 'express';
+import { DocumentoService } from '../services/documentoService';
+
+const documentoService = new DocumentoService();
 
 export class DocumentoController {
   async create(req: Request, res: Response) {
-    // Lógica para criar documento do cliente
-    res.status(201).json({ message: 'Documento criado' });
+    try {
+      const result = await documentoService.create(req.body);
+      if (result.success) {
+        res.status(201).json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error) {
+      res.status(500).json({ success: false, error: 'Erro interno do servidor' });
+    }
   }
+
   async getAll(req: Request, res: Response) {
-    // Lógica para listar todos os documentos
-    res.json([]);
+    try {
+      const result = await documentoService.getAll();
+      if (result.success) {
+        res.json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error) {
+      res.status(500).json({ success: false, error: 'Erro interno do servidor' });
+    }
   }
+
   async getById(req: Request, res: Response) {
-    // Lógica para buscar documento por id
-    res.json({});
+    try {
+      const id = parseInt(req.params.id);
+      const result = await documentoService.getById(id);
+      if (result.success) {
+        res.json(result);
+      } else {
+        res.status(404).json(result);
+      }
+    } catch (error) {
+      res.status(500).json({ success: false, error: 'Erro interno do servidor' });
+    }
   }
+
   async update(req: Request, res: Response) {
-    // Lógica para atualizar documento
-    res.json({ message: 'Documento atualizado' });
+    try {
+      const id = parseInt(req.params.id);
+      const result = await documentoService.update(id, req.body);
+      if (result.success) {
+        res.json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error) {
+      res.status(500).json({ success: false, error: 'Erro interno do servidor' });
+    }
   }
+
   async delete(req: Request, res: Response) {
-    // Lógica para deletar documento
-    res.json({ message: 'Documento deletado' });
+    try {
+      const id = parseInt(req.params.id);
+      const result = await documentoService.delete(id);
+      if (result.success) {
+        res.json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error) {
+      res.status(500).json({ success: false, error: 'Erro interno do servidor' });
+    }
   }
 } 
