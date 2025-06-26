@@ -1,22 +1,24 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useCreateServico } from '../../hooks';
+import { CreateServicoRequest } from '../../types/api';
 
 interface ServicoData {
-    id: number;
     nome: string;
-    preco: number;
     descricao: string;
-    duracao: string;
-    categoria: string;
+    preco: number;
+    duracao_minutos: number;
 }
 
 export default function RegistroServico() {
-    const [servico, setServico] = useState<Omit<ServicoData, 'id'>>({
+    const navigate = useNavigate();
+    const { execute: createServico, loading, error } = useCreateServico();
+    
+    const [servico, setServico] = useState<ServicoData>({
         nome: '',
-        preco: 0,
         descricao: '',
-        duracao: '',
-        categoria: ''
+        preco: 0,
+        duracao_minutos: 0
     });
     const [mensagem, setMensagem] = useState('');
 
@@ -24,11 +26,11 @@ export default function RegistroServico() {
         const { name, value } = e.target;
         setServico(prev => ({
             ...prev,
-            [name]: name === 'preco' ? parseFloat(value) : value
+            [name]: name === 'preco' || name === 'duracao_minutos' ? parseFloat(value) : value
         }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
         // Validações básicas
@@ -40,24 +42,24 @@ export default function RegistroServico() {
             setMensagem('O preço deve ser maior que zero');
             return;
         }
-        if (!servico.duracao.trim()) {
-            setMensagem('A duração é obrigatória');
-            return;
-        }
-        if (!servico.categoria.trim()) {
-            setMensagem('A categoria é obrigatória');
+        if (servico.duracao_minutos <= 0) {
+            setMensagem('A duração deve ser maior que zero');
             return;
         }
 
-        // Aqui você implementaria a lógica para salvar o serviço
-        setMensagem('Serviço registrado com sucesso!');
-        setServico({
-            nome: '',
-            preco: 0,
-            descricao: '',
-            duracao: '',
-            categoria: ''
-        });
+        const servicoData: CreateServicoRequest = {
+            nome: servico.nome.trim(),
+            descricao: servico.descricao.trim(),
+            preco: servico.preco,
+            duracao_minutos: servico.duracao_minutos
+        };
+
+        await createServico(servicoData);
+        
+        // Se não houve erro, redirecionar para a lista
+        if (!error) {
+            navigate('/servicos');
+        }
     };
 
     return (
@@ -69,6 +71,18 @@ export default function RegistroServico() {
                     Voltar
                 </Link>
             </div>
+
+            {mensagem && (
+                <div className="alert alert-warning" role="alert">
+                    {mensagem}
+                </div>
+            )}
+
+            {error && (
+                <div className="alert alert-danger" role="alert">
+                    Erro ao criar serviço: {error}
+                </div>
+            )}
 
             <div className="card shadow-sm">
                 <div className="card-header bg-success text-white">
@@ -114,46 +128,36 @@ export default function RegistroServico() {
                         </div>
 
                         <div className="mb-3">
-                            <label className="form-label">Duração</label>
+                            <label className="form-label">Duração (minutos)</label>
                             <input
-                                type="text"
+                                type="number"
                                 className="form-control"
-                                name="duracao"
-                                value={servico.duracao}
+                                name="duracao_minutos"
+                                value={servico.duracao_minutos}
                                 onChange={handleChange}
-                                placeholder="Ex: 1 hora, 30 minutos"
+                                min="1"
+                                placeholder="Ex: 60 para 1 hora"
                                 required
                             />
                         </div>
 
-                        <div className="mb-3">
-                            <label className="form-label">Categoria</label>
-                            <select
-                                className="form-select"
-                                name="categoria"
-                                value={servico.categoria}
-                                onChange={handleChange}
-                                required
+                        <div className="d-grid">
+                            <button 
+                                type="submit" 
+                                className="btn btn-success"
+                                disabled={loading}
                             >
-                                <option value="">Selecione uma categoria</option>
-                                <option value="banho">Banho e Tosa</option>
-                                <option value="veterinario">Veterinário</option>
-                                <option value="hospedagem">Hospedagem</option>
-                                <option value="adestramento">Adestramento</option>
-                                <option value="spa">Spa</option>
-                            </select>
-                        </div>
-
-                        {mensagem && (
-                            <div className={`alert ${mensagem.includes('Erro') ? 'alert-danger' : 'alert-success'}`} role="alert">
-                                {mensagem}
-                            </div>
-                        )}
-
-                        <div className="d-flex justify-content-end">
-                            <button type="submit" className="btn btn-success">
-                                <i className="bi bi-check-lg me-2"></i>
-                                Registrar Serviço
+                                {loading ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        Salvando...
+                                    </>
+                                ) : (
+                                    <>
+                                        <i className="bi bi-check-lg me-2"></i>
+                                        Registrar Serviço
+                                    </>
+                                )}
                             </button>
                         </div>
                     </form>

@@ -47,8 +47,8 @@ export default function AppRoutes() {
             {/* rotas de vendas */}
             <Route path="/vendas" element={<VendasList />} />
             <Route path="/vendas/novo" element={<RegistroVenda />} />
-            <Route path="/vendas/:id" element={<DetalheVenda editar='false' />} />
-            <Route path="/vendas/:id/editar" element={<DetalheVenda editar='true' />} />
+            <Route path="/vendas/:tipo/:id" element={<DetalheVenda editar='false' />} />
+            <Route path="/vendas/:tipo/:id/editar" element={<DetalheVenda editar='true' />} />
         </Routes >
     );
 }

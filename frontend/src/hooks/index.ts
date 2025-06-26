@@ -14,6 +14,7 @@ export {
 export {
     usePets,
     usePet,
+    usePetById,
     usePetsByCliente,
     useCreatePet,
     useUpdatePet,
@@ -24,6 +25,7 @@ export {
 export {
     useServicos,
     useServico,
+    useServicoById,
     useCreateServico,
     useUpdateServico,
     useDeleteServico
@@ -33,8 +35,31 @@ export {
 export {
     useProdutos,
     useProduto,
+    useProdutoById,
     useCreateProduto,
     useUpdateProduto,
     useUpdateEstoque,
     useDeleteProduto
-} from './useProduto'; 
+} from './useProduto';
+
+// ClienteServico hooks
+export {
+    useClienteServicos,
+    useClienteServico,
+    useClienteServicoById,
+    useClienteServicosByCliente,
+    useCreateClienteServico,
+    useUpdateClienteServico,
+    useDeleteClienteServico
+} from './useClienteServico';
+
+// ClienteProduto hooks
+export {
+    useClienteProdutos,
+    useClienteProduto,
+    useClienteProdutoById,
+    useClienteProdutosByCliente,
+    useCreateClienteProduto,
+    useUpdateClienteProduto,
+    useDeleteClienteProduto
+} from './useClienteProduto'; 

@@ -302,6 +302,23 @@ export default function ClienteDetalhes() {
         }
     };
 
+    // Funções para adicionar novos campos vazios (quando já existem itens)
+    const handleAddNewTelefone = () => {
+        handleAddItem('telefones', { ddd: '', numero: '' });
+    };
+
+    const handleAddNewEndereco = () => {
+        handleAddItem('enderecos', { rua: '', numero: '', bairro: '', cidade: '', estado: '', cep: '', complemento: '' });
+    };
+
+    const handleAddNewDocumento = () => {
+        handleAddItem('documentos', { tipo: 'CPF', valor: '' });
+    };
+
+    const handleAddNewPet = () => {
+        handleAddItem('pets', { nome: '', raca: '', genero: 'M', tipo: '' });
+    };
+
     const renderInput = (
         label: string,
         name: string,
@@ -432,7 +449,7 @@ export default function ClienteDetalhes() {
                                 <input className="form-control" name="numero" placeholder="Número" value={telefone.numero} onChange={e => handleArrayChange('telefones', idx, e)} />
                                 <button type="button" className="btn btn-danger" onClick={() => handleRemoveItem('telefones', idx)}>-</button>
                                 {idx === formData.telefones.length - 1 && (
-                                    <button type="button" className="btn btn-success" onClick={() => handleAddTelefone()}>+</button>
+                                    <button type="button" className="btn btn-success" onClick={() => handleAddNewTelefone()}>+</button>
                                 )}
                             </div>
                         ))}
@@ -459,7 +476,7 @@ export default function ClienteDetalhes() {
             {editando ? (
                 <div className="card shadow-sm mb-4">
                     <div className="card-header bg-warning text-dark">
-                        <h5 className="mb-0">Endereços</h5>
+                        <h5 className="mb-0">Endereço</h5>
                     </div>
                     <div className="card-body">
                         {formData.enderecos.length === 0 && (
@@ -485,7 +502,7 @@ export default function ClienteDetalhes() {
                                 <input className="form-control" name="complemento" placeholder="Complemento" value={endereco.complemento} onChange={e => handleArrayChange('enderecos', idx, e)} />
                                 <button type="button" className="btn btn-danger" onClick={() => handleRemoveItem('enderecos', idx)}>-</button>
                                 {idx === formData.enderecos.length - 1 && (
-                                    <button type="button" className="btn btn-success" onClick={() => handleAddEndereco()}>+</button>
+                                    <button type="button" className="btn btn-success" onClick={() => handleAddNewEndereco()}>+</button>
                                 )}
                             </div>
                         ))}
@@ -495,7 +512,7 @@ export default function ClienteDetalhes() {
                 cliente.enderecos && (
                 <div className="card shadow-sm mb-4">
                     <div className="card-header bg-warning text-dark">
-                        <h5 className="mb-0">Endereços</h5>
+                        <h5 className="mb-0">Endereço</h5>
                     </div>
                     <div className="card-body">
                         {cliente.enderecos.map((endereco) => (
@@ -550,7 +567,7 @@ export default function ClienteDetalhes() {
                                 <input className="form-control" name="valor" placeholder="Valor" value={doc.valor} onChange={e => handleArrayChange('documentos', idx, e)} />
                                 <button type="button" className="btn btn-danger" onClick={() => handleRemoveItem('documentos', idx)}>-</button>
                                 {idx === formData.documentos.length - 1 && (
-                                    <button type="button" className="btn btn-success" onClick={() => handleAddDocumento()}>+</button>
+                                    <button type="button" className="btn btn-success" onClick={() => handleAddNewDocumento()}>+</button>
                                 )}
                             </div>
                         ))}
@@ -604,7 +621,7 @@ export default function ClienteDetalhes() {
                                 <input className="form-control" name="tipo" placeholder="Tipo" value={pet.tipo} onChange={e => handleArrayChange('pets', idx, e)} />
                                 <button type="button" className="btn btn-danger" onClick={() => handleRemoveItem('pets', idx)}>-</button>
                                 {idx === formData.pets.length - 1 && (
-                                    <button type="button" className="btn btn-success" onClick={() => handleAddPet()}>+</button>
+                                    <button type="button" className="btn btn-success" onClick={() => handleAddNewPet()}>+</button>
                                 )}
                             </div>
                         ))}

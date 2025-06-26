@@ -1,99 +1,97 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { usePetById, useUpdatePet } from '../../hooks';
+import { UpdatePetRequest } from '../../types/api';
 
-interface PetData {
-    id: number;
+interface PetFormData {
     nome: string;
-    especie: string;
     raca: string;
-    idade: number;
-    peso: number;
-    clienteId: number;
-    clienteNome: string;
-    observacoes: string;
+    genero: "M" | "F";
+    tipo: string;
 }
 
 export default function DetalhePet() {
     const { id } = useParams<{ id: string }>();
-    const [pet, setPet] = useState<PetData | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [mensagem, setMensagem] = useState('');
+    const { data: pet, loading, error, execute: fetchPet } = usePetById(id ? parseInt(id) : 0);
+    const { execute: updatePet, loading: loadingUpdate, error: errorUpdate } = useUpdatePet();
+    
     const [editando, setEditando] = useState(false);
+    const [formData, setFormData] = useState<PetFormData>({
+        nome: '',
+        raca: '',
+        genero: 'M',
+        tipo: ''
+    });
+    const [mensagem, setMensagem] = useState('');
 
     useEffect(() => {
-        fetch('/pets.json')
-            .then((res) => {
-                if (!res.ok) throw new Error('Erro ao buscar os dados do pet');
-                return res.json();
-            })
-            .then((data: PetData[]) => {
-                const petEncontrado = data.find(p => p.id === Number(id));
-                if (petEncontrado) {
-                    setPet(petEncontrado);
-                } else {
-                    setMensagem('Pet não encontrado');
-                }
-            })
-            .catch((err) => setMensagem(`Erro: ${err.message}`))
-            .finally(() => setLoading(false));
-    }, [id]);
+        if (pet) {
+            setFormData({
+                nome: pet.nome,
+                raca: pet.raca,
+                genero: pet.genero,
+                tipo: pet.tipo
+            });
+        }
+    }, [pet]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        if (!pet) return;
-        
         const { name, value } = e.target;
-        setPet(prev => {
-            if (!prev) return null;
-            return {
-                ...prev,
-                [name]: name === 'idade' || name === 'peso' ? parseFloat(value) : value
-            };
-        });
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Aqui você implementaria a lógica para salvar as alterações
-        setMensagem('Alterações salvas com sucesso!');
-        setEditando(false);
+        
+        if (!pet || !id) return;
+
+        // Validações básicas
+        if (!formData.nome.trim()) {
+            setMensagem('O nome do pet é obrigatório');
+            return;
+        }
+        if (!formData.raca.trim()) {
+            setMensagem('A raça do pet é obrigatória');
+            return;
+        }
+        if (!formData.tipo.trim()) {
+            setMensagem('O tipo do pet é obrigatório');
+            return;
+        }
+
+        const petData: UpdatePetRequest = {
+            nome: formData.nome.trim(),
+            raca: formData.raca.trim(),
+            genero: formData.genero,
+            tipo: formData.tipo.trim()
+        };
+
+        await updatePet(parseInt(id), petData);
+        
+        // Se não houve erro, sair do modo de edição
+        if (!errorUpdate) {
+            setEditando(false);
+            setMensagem('Pet atualizado com sucesso!');
+            // Recarregar dados do pet
+            fetchPet(parseInt(id));
+        }
     };
 
-    const renderField = (
-        label: string,
-        name: keyof PetData,
-        type: 'text' | 'number' | 'textarea' = 'text'
-    ) => (
-        <div className="mb-3">
-            <label className="form-label">{label}</label>
-            {editando ? (
-                type === 'textarea' ? (
-                    <textarea
-                        className="form-control"
-                        name={name}
-                        value={pet?.[name] || ''}
-                        onChange={handleChange}
-                        rows={3}
-                    />
-                ) : (
-                    <input
-                        type={type}
-                        className="form-control"
-                        name={name}
-                        value={pet?.[name] || ''}
-                        onChange={handleChange}
-                    />
-                )
-            ) : (
-                <p className="form-control-plaintext">
-                    {name === 'peso' 
-                        ? `${pet?.[name]} kg`
-                        : name === 'idade'
-                        ? `${pet?.[name]} anos`
-                        : pet?.[name] || ''}
-                </p>
-            )}
-        </div>
-    );
+    const handleCancel = () => {
+        if (pet) {
+            setFormData({
+                nome: pet.nome,
+                raca: pet.raca,
+                genero: pet.genero,
+                tipo: pet.tipo
+            });
+        }
+        setEditando(false);
+        setMensagem('');
+    };
 
     if (loading) {
         return (
@@ -107,11 +105,11 @@ export default function DetalhePet() {
         );
     }
 
-    if (mensagem) {
+    if (error) {
         return (
             <div className="container py-4">
-                <div className="alert alert-success" role="alert">
-                    {mensagem}
+                <div className="alert alert-danger">
+                    Erro ao carregar pet: {error}
                 </div>
                 <Link to="/pets" className="btn btn-outline-secondary">
                     <i className="bi bi-arrow-left me-2"></i>
@@ -135,6 +133,49 @@ export default function DetalhePet() {
         );
     }
 
+    const renderField = (
+        label: string,
+        name: keyof PetFormData,
+        type: 'text' | 'select' = 'text',
+        options?: { value: string; label: string }[]
+    ) => (
+        <div className="mb-3">
+            <label className="form-label">{label}</label>
+            {editando ? (
+                type === 'select' ? (
+                    <select
+                        className="form-select"
+                        name={name}
+                        value={formData[name]}
+                        onChange={handleChange}
+                        required
+                    >
+                        {options?.map(option => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                ) : (
+                    <input
+                        type={type}
+                        className="form-control"
+                        name={name}
+                        value={formData[name]}
+                        onChange={handleChange}
+                        required
+                    />
+                )
+            ) : (
+                <p className="form-control-plaintext">
+                    {name === 'genero' 
+                        ? (formData[name] === 'M' ? 'Macho' : 'Fêmea')
+                        : formData[name] || ''}
+                </p>
+            )}
+        </div>
+    );
+
     return (
         <div className="container py-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
@@ -144,15 +185,56 @@ export default function DetalhePet() {
                         <i className="bi bi-arrow-left me-2"></i>
                         Voltar
                     </Link>
-                    <button
-                        className="btn btn-primary"
-                        onClick={() => setEditando(!editando)}
-                    >
-                        <i className={`bi bi-${editando ? 'check' : 'pencil'} me-2`}></i>
-                        {editando ? 'Salvar' : 'Editar'}
-                    </button>
+                    {!editando ? (
+                        <button
+                            className="btn btn-primary"
+                            onClick={() => setEditando(true)}
+                        >
+                            <i className="bi bi-pencil me-2"></i>
+                            Editar
+                        </button>
+                    ) : (
+                        <div>
+                            <button
+                                className="btn btn-outline-secondary me-2"
+                                onClick={handleCancel}
+                            >
+                                <i className="bi bi-x me-2"></i>
+                                Cancelar
+                            </button>
+                            <button
+                                className="btn btn-success"
+                                onClick={handleSubmit}
+                                disabled={loadingUpdate}
+                            >
+                                {loadingUpdate ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        Salvando...
+                                    </>
+                                ) : (
+                                    <>
+                                        <i className="bi bi-check me-2"></i>
+                                        Salvar
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
+
+            {mensagem && (
+                <div className="alert alert-success" role="alert">
+                    {mensagem}
+                </div>
+            )}
+
+            {errorUpdate && (
+                <div className="alert alert-danger" role="alert">
+                    Erro ao atualizar pet: {errorUpdate}
+                </div>
+            )}
 
             <div className="card shadow-sm">
                 <div className="card-header bg-success text-white">
@@ -161,12 +243,17 @@ export default function DetalhePet() {
                 <div className="card-body">
                     <form onSubmit={handleSubmit}>
                         {renderField('Nome', 'nome')}
-                        {renderField('Espécie', 'especie')}
+                        {renderField('Tipo', 'tipo')}
                         {renderField('Raça', 'raca')}
-                        {renderField('Idade', 'idade', 'number')}
-                        {renderField('Peso', 'peso', 'number')}
-                        {renderField('Dono', 'clienteNome')}
-                        {renderField('Observações', 'observacoes', 'textarea')}
+                        {renderField('Gênero', 'genero', 'select', [
+                            { value: 'M', label: 'Macho' },
+                            { value: 'F', label: 'Fêmea' }
+                        ])}
+                        
+                        <div className="mb-3">
+                            <label className="form-label">ID do Cliente</label>
+                            <p className="form-control-plaintext">{pet.cliente_id}</p>
+                        </div>
                     </form>
                 </div>
             </div>

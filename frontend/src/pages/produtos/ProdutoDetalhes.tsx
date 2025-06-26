@@ -1,95 +1,98 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { useProdutoById, useUpdateProduto } from '../../hooks';
+import { UpdateProdutoRequest } from '../../types/api';
+import { formatCurrency } from '../../utils/apiUtils';
 
-interface ProdutoData {
-    id: number;
+interface ProdutoFormData {
     nome: string;
-    preco: number;
     descricao: string;
-    quantidade: number;
-    categoria: string;
-    fornecedor: string;
+    preco: number;
+    estoque: number;
 }
 
 export default function ProdutoDetalhes() {
     const { id } = useParams<{ id: string }>();
-    const [produto, setProduto] = useState<ProdutoData | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [mensagem, setMensagem] = useState('');
+    const { data: produto, loading, error, execute: fetchProduto } = useProdutoById(id ? parseInt(id) : 0);
+    const { execute: updateProduto, loading: loadingUpdate, error: errorUpdate } = useUpdateProduto();
+    
     const [editando, setEditando] = useState(false);
+    const [formData, setFormData] = useState<ProdutoFormData>({
+        nome: '',
+        descricao: '',
+        preco: 0,
+        estoque: 0
+    });
+    const [mensagem, setMensagem] = useState('');
 
     useEffect(() => {
-        fetch('/produtos.json')
-            .then((res) => {
-                if (!res.ok) throw new Error('Erro ao buscar os dados do produto');
-                return res.json();
-            })
-            .then((data: ProdutoData[]) => {
-                const produtoEncontrado = data.find(p => p.id === Number(id));
-                if (produtoEncontrado) {
-                    setProduto(produtoEncontrado);
-                } else {
-                    setMensagem('Produto não encontrado');
-                }
-            })
-            .catch((err) => setMensagem(`Erro: ${err.message}`))
-            .finally(() => setLoading(false));
-    }, [id]);
+        if (produto) {
+            setFormData({
+                nome: produto.nome,
+                descricao: produto.descricao || '',
+                preco: produto.preco,
+                estoque: produto.estoque
+            });
+        }
+    }, [produto]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        if (!produto) return;
-        
         const { name, value } = e.target;
-        setProduto(prev => {
-            if (!prev) return null;
-            return {
-                ...prev,
-                [name]: name === 'preco' || name === 'quantidade' ? parseFloat(value) : value
-            };
-        });
+        setFormData(prev => ({
+            ...prev,
+            [name]: name === 'preco' || name === 'estoque' ? parseFloat(value) : value
+        }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Aqui você implementaria a lógica para salvar as alterações
-        setMensagem('Alterações salvas com sucesso!');
-        setEditando(false);
+        
+        if (!produto || !id) return;
+
+        // Validações básicas
+        if (!formData.nome.trim()) {
+            setMensagem('O nome do produto é obrigatório');
+            return;
+        }
+        if (formData.preco <= 0) {
+            setMensagem('O preço deve ser maior que zero');
+            return;
+        }
+        if (formData.estoque < 0) {
+            setMensagem('A quantidade não pode ser negativa');
+            return;
+        }
+
+        const produtoData: UpdateProdutoRequest = {
+            nome: formData.nome.trim(),
+            descricao: formData.descricao.trim(),
+            preco: formData.preco,
+            estoque: formData.estoque
+        };
+
+        await updateProduto(parseInt(id), produtoData);
+        
+        // Se não houve erro, sair do modo de edição
+        if (!errorUpdate) {
+            setEditando(false);
+            setMensagem('Produto atualizado com sucesso!');
+            // Recarregar dados do produto
+            fetchProduto(parseInt(id));
+        }
     };
 
-    const renderField = (
-        label: string,
-        name: keyof ProdutoData,
-        type: 'text' | 'number' | 'textarea' = 'text'
-    ) => (
-        <div className="mb-3">
-            <label className="form-label">{label}</label>
-            {editando ? (
-                type === 'textarea' ? (
-                    <textarea
-                        className="form-control"
-                        name={name}
-                        value={produto?.[name] || ''}
-                        onChange={handleChange}
-                        rows={3}
-                    />
-                ) : (
-                    <input
-                        type={type}
-                        className="form-control"
-                        name={name}
-                        value={produto?.[name] || ''}
-                        onChange={handleChange}
-                    />
-                )
-            ) : (
-                <p className="form-control-plaintext">
-                    {name === 'preco' 
-                        ? `R$ ${(produto?.[name] || 0).toFixed(2)}`
-                        : produto?.[name] || ''}
-                </p>
-            )}
-        </div>
-    );
+    const handleCancel = () => {
+        if (produto) {
+            setFormData({
+                nome: produto.nome,
+                descricao: produto.descricao || '',
+                preco: produto.preco,
+                estoque: produto.estoque
+            });
+        }
+        setEditando(false);
+        setMensagem('');
+    };
 
     if (loading) {
         return (
@@ -103,11 +106,11 @@ export default function ProdutoDetalhes() {
         );
     }
 
-    if (mensagem) {
+    if (error) {
         return (
             <div className="container py-4">
-                <div className="alert alert-success" role="alert">
-                    {mensagem}
+                <div className="alert alert-danger">
+                    Erro ao carregar produto: {error}
                 </div>
                 <Link to="/produtos" className="btn btn-outline-secondary">
                     <i className="bi bi-arrow-left me-2"></i>
@@ -131,6 +134,44 @@ export default function ProdutoDetalhes() {
         );
     }
 
+    const renderField = (
+        label: string,
+        name: keyof ProdutoFormData,
+        type: 'text' | 'number' | 'textarea' = 'text'
+    ) => (
+        <div className="mb-3">
+            <label className="form-label">{label}</label>
+            {editando ? (
+                type === 'textarea' ? (
+                    <textarea
+                        className="form-control"
+                        name={name}
+                        value={formData[name]}
+                        onChange={handleChange}
+                        rows={3}
+                    />
+                ) : (
+                    <input
+                        type={type}
+                        className="form-control"
+                        name={name}
+                        value={formData[name]}
+                        onChange={handleChange}
+                        required
+                    />
+                )
+            ) : (
+                <p className="form-control-plaintext">
+                    {name === 'preco' 
+                        ? formatCurrency(formData[name])
+                        : name === 'estoque'
+                        ? `${formData[name]} unidades`
+                        : formData[name] || ''}
+                </p>
+            )}
+        </div>
+    );
+
     return (
         <div className="container py-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
@@ -140,15 +181,56 @@ export default function ProdutoDetalhes() {
                         <i className="bi bi-arrow-left me-2"></i>
                         Voltar
                     </Link>
-                    <button
-                        className="btn btn-primary"
-                        onClick={() => setEditando(!editando)}
-                    >
-                        <i className={`bi bi-${editando ? 'check' : 'pencil'} me-2`}></i>
-                        {editando ? 'Salvar' : 'Editar'}
-                    </button>
+                    {!editando ? (
+                        <button
+                            className="btn btn-primary"
+                            onClick={() => setEditando(true)}
+                        >
+                            <i className="bi bi-pencil me-2"></i>
+                            Editar
+                        </button>
+                    ) : (
+                        <div>
+                            <button
+                                className="btn btn-outline-secondary me-2"
+                                onClick={handleCancel}
+                            >
+                                <i className="bi bi-x me-2"></i>
+                                Cancelar
+                            </button>
+                            <button
+                                className="btn btn-success"
+                                onClick={handleSubmit}
+                                disabled={loadingUpdate}
+                            >
+                                {loadingUpdate ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        Salvando...
+                                    </>
+                                ) : (
+                                    <>
+                                        <i className="bi bi-check me-2"></i>
+                                        Salvar
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
+
+            {mensagem && (
+                <div className="alert alert-success" role="alert">
+                    {mensagem}
+                </div>
+            )}
+
+            {errorUpdate && (
+                <div className="alert alert-danger" role="alert">
+                    Erro ao atualizar produto: {errorUpdate}
+                </div>
+            )}
 
             <div className="card shadow-sm">
                 <div className="card-header bg-success text-white">
@@ -159,9 +241,7 @@ export default function ProdutoDetalhes() {
                         {renderField('Nome', 'nome')}
                         {renderField('Preço', 'preco', 'number')}
                         {renderField('Descrição', 'descricao', 'textarea')}
-                        {renderField('Quantidade em Estoque', 'quantidade', 'number')}
-                        {renderField('Categoria', 'categoria')}
-                        {renderField('Fornecedor', 'fornecedor')}
+                        {renderField('Quantidade em Estoque', 'estoque', 'number')}
                     </form>
                 </div>
             </div>

@@ -59,6 +59,13 @@ export default function ClienteList() {
 
     return (
         <div className="container py-4">
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h2>Clientes</h2>
+                <Link to="/clientes/novo" className="btn btn-success">
+                    <i className="bi bi-plus-circle me-2"></i>
+                    Novo Cliente
+                </Link>
+            </div>
             <div className="card shadow-sm mb-4">
                 <div className="card-body">
                     <div className="input-group">

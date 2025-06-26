@@ -9,6 +9,8 @@ export { produtoService } from './produtoService';
 export { telefoneService } from './telefoneService';
 export { enderecoService } from './enderecoService';
 export { documentoService } from './documentoService';
+export { clienteServicoService } from './clienteServicoService';
+export { clienteProdutoService } from './clienteProdutoService';
 
 // Service classes (for direct instantiation if needed)
 export { ClienteService } from './clienteService';
@@ -17,4 +19,6 @@ export { ServicoService } from './servicoService';
 export { ProdutoService } from './produtoService';
 export { TelefoneService } from './telefoneService';
 export { EnderecoService } from './enderecoService';
-export { DocumentoService } from './documentoService'; 
+export { DocumentoService } from './documentoService';
+export { ClienteServicoService } from './clienteServicoService';
+export { ClienteProdutoService } from './clienteProdutoService'; 

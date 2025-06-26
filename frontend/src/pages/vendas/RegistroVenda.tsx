@@ -1,35 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-
-interface ClienteData {
-    id: number;
-    nome: string;
-    email: string;
-    telefone: string;
-    endereco: string;
-    cpf: string;
-    dataCadastro: string;
-    observacoes: string;
-}
-
-interface ProdutoData {
-    id: number;
-    nome: string;
-    preco: number;
-    descricao: string;
-    quantidade: number;
-    categoria: string;
-    fornecedor: string;
-}
-
-interface ServicoData {
-    id: number;
-    nome: string;
-    preco: number;
-    descricao: string;
-    duracao: string;
-    categoria: string;
-}
+import { Link, useNavigate } from 'react-router-dom';
+import { useClientes, useProdutos, useServicos, useCreateClienteProduto, useCreateClienteServico } from '../../hooks';
+import { formatCurrency } from '../../utils/apiUtils';
 
 interface ItemVenda {
     id: number;
@@ -38,19 +10,17 @@ interface ItemVenda {
     preco: number;
     quantidade: number;
     subtotal: number;
-}
-
-interface VendaData {
-    clienteId: number;
-    itens: ItemVenda[];
-    total: number;
-    formaPagamento: string;
+    itemId: number; // ID do produto ou serviço
 }
 
 export default function RegistroVenda() {
-    const [clientes, setClientes] = useState<ClienteData[]>([]);
-    const [produtos, setProdutos] = useState<ProdutoData[]>([]);
-    const [servicos, setServicos] = useState<ServicoData[]>([]);
+    const navigate = useNavigate();
+    const { data: clientes, loading: loadingClientes, error: errorClientes, execute: fetchClientes } = useClientes();
+    const { data: produtos, loading: loadingProdutos, error: errorProdutos, execute: fetchProdutos } = useProdutos();
+    const { data: servicos, loading: loadingServicos, error: errorServicos, execute: fetchServicos } = useServicos();
+    const { execute: createClienteProduto, loading: loadingCreateProduto, error: errorCreateProduto } = useCreateClienteProduto();
+    const { execute: createClienteServico, loading: loadingCreateServico, error: errorCreateServico } = useCreateClienteServico();
+    
     const [clienteSelecionado, setClienteSelecionado] = useState<number>(0);
     const [itens, setItens] = useState<ItemVenda[]>([]);
     const [tipoItem, setTipoItem] = useState<'produto' | 'servico'>('produto');
@@ -58,22 +28,22 @@ export default function RegistroVenda() {
     const [quantidade, setQuantidade] = useState<number>(1);
     const [formaPagamento, setFormaPagamento] = useState<string>('');
     const [mensagem, setMensagem] = useState('');
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        Promise.all([
-            fetch('/clientes.json').then(res => res.json()),
-            fetch('/produtos.json').then(res => res.json()),
-            fetch('/servicos.json').then(res => res.json())
-        ])
-            .then(([clientesData, produtosData, servicosData]) => {
-                setClientes(clientesData);
-                setProdutos(produtosData);
-                setServicos(servicosData);
-            })
-            .catch((err) => setMensagem(`Erro: ${err.message}`))
-            .finally(() => setLoading(false));
-    }, []);
+        const carregarDados = async () => {
+            try {
+                await Promise.all([
+                    fetchClientes(),
+                    fetchProdutos(),
+                    fetchServicos()
+                ]);
+            } catch {
+                setMensagem('Erro ao carregar dados');
+            }
+        };
+
+        carregarDados();
+    }, [fetchClientes, fetchProdutos, fetchServicos]);
 
     const adicionarItem = () => {
         if (!itemSelecionado || quantidade <= 0) {
@@ -82,8 +52,8 @@ export default function RegistroVenda() {
         }
 
         const item = tipoItem === 'produto'
-            ? produtos.find(p => p.id === itemSelecionado)
-            : servicos.find(s => s.id === itemSelecionado);
+            ? produtos?.find(p => p.id === itemSelecionado)
+            : servicos?.find(s => s.id === itemSelecionado);
 
         if (!item) return;
 
@@ -93,7 +63,8 @@ export default function RegistroVenda() {
             nome: item.nome,
             preco: item.preco,
             quantidade: quantidade,
-            subtotal: item.preco * quantidade
+            subtotal: item.preco * quantidade,
+            itemId: item.id
         };
 
         setItens(prev => [...prev, novoItem]);
@@ -109,7 +80,7 @@ export default function RegistroVenda() {
         return itens.reduce((total, item) => total + item.subtotal, 0);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!clienteSelecionado) {
@@ -127,19 +98,54 @@ export default function RegistroVenda() {
             return;
         }
 
-        const venda: VendaData = {
-            clienteId: clienteSelecionado,
-            itens: itens,
-            total: calcularTotal(),
-            formaPagamento: formaPagamento
-        };
+        try {
+            // Separar itens por tipo
+            const itensProdutos = itens.filter(item => item.tipo === 'produto');
+            const itensServicos = itens.filter(item => item.tipo === 'servico');
 
-        // Aqui você implementaria a lógica para salvar a venda
-        setMensagem('Venda registrada com sucesso!');
-        setClienteSelecionado(0);
-        setItens([]);
-        setFormaPagamento('');
+            // Criar vendas de produtos
+            for (const item of itensProdutos) {
+                await createClienteProduto({
+                    cliente_id: clienteSelecionado,
+                    produto_id: item.itemId,
+                    quantidade: item.quantidade,
+                    data_compra: new Date(),
+                    valor_unitario: item.preco,
+                    desconto: 0
+                });
+            }
+
+            // Criar vendas de serviços
+            for (const item of itensServicos) {
+                await createClienteServico({
+                    cliente_id: clienteSelecionado,
+                    servico_id: item.itemId,
+                    data_realizacao: new Date(),
+                    valor_unitario: item.preco,
+                    desconto: 0,
+                    observacoes: `Quantidade: ${item.quantidade}`
+                });
+            }
+
+            setMensagem('Venda registrada com sucesso!');
+            
+            // Limpar formulário
+            setClienteSelecionado(0);
+            setItens([]);
+            setFormaPagamento('');
+            
+            // Redirecionar após um breve delay
+            setTimeout(() => {
+                navigate('/vendas');
+            }, 1500);
+
+        } catch {
+            setMensagem('Erro ao registrar venda');
+        }
     };
+
+    const loading = loadingClientes || loadingProdutos || loadingServicos;
+    const error = errorClientes || errorProdutos || errorServicos || errorCreateProduto || errorCreateServico;
 
     if (loading) {
         return (
@@ -149,6 +155,20 @@ export default function RegistroVenda() {
                         <span className="visually-hidden">Carregando...</span>
                     </div>
                 </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="container py-4">
+                <div className="alert alert-danger">
+                    Erro ao carregar dados: {error}
+                </div>
+                <Link to="/vendas" className="btn btn-outline-secondary">
+                    <i className="bi bi-arrow-left me-2"></i>
+                    Voltar
+                </Link>
             </div>
         );
     }
@@ -164,7 +184,7 @@ export default function RegistroVenda() {
             </div>
 
             {mensagem && (
-                <div className="alert alert-success" role="alert">
+                <div className={`alert ${mensagem.includes('sucesso') ? 'alert-success' : 'alert-warning'}`} role="alert">
                     {mensagem}
                 </div>
             )}
@@ -184,7 +204,7 @@ export default function RegistroVenda() {
                                 required
                             >
                                 <option value="">Selecione o cliente</option>
-                                {clientes.map(cliente => (
+                                {clientes?.map(cliente => (
                                     <option key={cliente.id} value={cliente.id}>
                                         {cliente.nome}
                                     </option>
@@ -219,14 +239,14 @@ export default function RegistroVenda() {
                                         >
                                             <option value="">Selecione o item</option>
                                             {tipoItem === 'produto'
-                                                ? produtos.map(produto => (
+                                                ? produtos?.map(produto => (
                                                     <option key={produto.id} value={produto.id}>
-                                                        {produto.nome} - R$ {produto.preco.toFixed(2)}
+                                                        {produto.nome} - {formatCurrency(produto.preco)}
                                                     </option>
                                                 ))
-                                                : servicos.map(servico => (
+                                                : servicos?.map(servico => (
                                                     <option key={servico.id} value={servico.id}>
-                                                        {servico.nome} - R$ {servico.preco.toFixed(2)}
+                                                        {servico.nome} - {formatCurrency(servico.preco)}
                                                     </option>
                                                 ))
                                             }
@@ -279,9 +299,9 @@ export default function RegistroVenda() {
                                                 {itens.map(item => (
                                                     <tr key={item.id}>
                                                         <td>{item.nome}</td>
-                                                        <td>R$ {item.preco.toFixed(2)}</td>
+                                                        <td>{formatCurrency(item.preco)}</td>
                                                         <td>{item.quantidade}</td>
-                                                        <td>R$ {item.subtotal.toFixed(2)}</td>
+                                                        <td>{formatCurrency(item.subtotal)}</td>
                                                         <td>
                                                             <button
                                                                 type="button"
@@ -300,7 +320,7 @@ export default function RegistroVenda() {
                                                         <strong>Total:</strong>
                                                     </td>
                                                     <td>
-                                                        <strong>R$ {calcularTotal().toFixed(2)}</strong>
+                                                        <strong>{formatCurrency(calcularTotal())}</strong>
                                                     </td>
                                                     <td></td>
                                                 </tr>
@@ -328,9 +348,22 @@ export default function RegistroVenda() {
                         </div>
 
                         <div className="d-grid">
-                            <button type="submit" className="btn btn-success">
-                                <i className="bi bi-save me-2"></i>
-                                Registrar Venda
+                            <button 
+                                type="submit" 
+                                className="btn btn-success"
+                                disabled={loadingCreateProduto || loadingCreateServico}
+                            >
+                                {loadingCreateProduto || loadingCreateServico ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        Salvando...
+                                    </>
+                                ) : (
+                                    <>
+                                        <i className="bi bi-save me-2"></i>
+                                        Registrar Venda
+                                    </>
+                                )}
                             </button>
                         </div>
                     </form>

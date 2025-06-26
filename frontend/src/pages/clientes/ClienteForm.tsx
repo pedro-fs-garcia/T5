@@ -140,7 +140,7 @@ export default function ClienteForm() {
                         <li>Os campos marcados com * são obrigatórios</li>
                         <li>O nome social é opcional</li>
                         <li>O e-mail deve ser válido</li>
-                        <li>Telefones e endereços podem ser adicionados posteriormente na edição do cliente</li>
+                        <li>Telefones e endereços devem ser adicionados posteriormente na edição do cliente</li>
                     </ul>
                 </div>
             </div>

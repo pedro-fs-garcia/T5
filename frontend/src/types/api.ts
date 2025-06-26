@@ -87,6 +87,8 @@ export interface ClienteServico {
     desconto: number;
     valor_total: number;
     observacoes?: string;
+    cliente_nome?: string;
+    servico_nome?: string;
 }
 
 export interface ClienteProduto {
@@ -98,6 +100,8 @@ export interface ClienteProduto {
     valor_unitario: number;
     desconto: number;
     valor_total: number;
+    cliente_nome?: string;
+    produto_nome?: string;
 }
 
 // Request types

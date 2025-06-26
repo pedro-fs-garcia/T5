@@ -1,24 +1,24 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useCreateProduto } from '../../hooks';
+import { CreateProdutoRequest } from '../../types/api';
 
 interface ProdutoData {
-    id: number;
     nome: string;
-    preco: number;
     descricao: string;
-    quantidade: number;
-    categoria: string;
-    fornecedor: string;
+    preco: number;
+    estoque: number;
 }
 
 export default function ProdutoForm() {
-    const [produto, setProduto] = useState<Omit<ProdutoData, 'id'>>({
+    const navigate = useNavigate();
+    const { execute: createProduto, loading, error } = useCreateProduto();
+    
+    const [produto, setProduto] = useState<ProdutoData>({
         nome: '',
-        preco: 0,
         descricao: '',
-        quantidade: 0,
-        categoria: '',
-        fornecedor: ''
+        preco: 0,
+        estoque: 0
     });
     const [mensagem, setMensagem] = useState('');
 
@@ -26,11 +26,11 @@ export default function ProdutoForm() {
         const { name, value } = e.target;
         setProduto(prev => ({
             ...prev,
-            [name]: name === 'preco' || name === 'quantidade' ? parseFloat(value) : value
+            [name]: name === 'preco' || name === 'estoque' ? parseFloat(value) : value
         }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
         // Validações básicas
@@ -42,29 +42,24 @@ export default function ProdutoForm() {
             setMensagem('O preço deve ser maior que zero');
             return;
         }
-        if (produto.quantidade < 0) {
+        if (produto.estoque < 0) {
             setMensagem('A quantidade não pode ser negativa');
             return;
         }
-        if (!produto.categoria.trim()) {
-            setMensagem('A categoria é obrigatória');
-            return;
-        }
-        if (!produto.fornecedor.trim()) {
-            setMensagem('O fornecedor é obrigatório');
-            return;
-        }
 
-        // Aqui você implementaria a lógica para salvar o produto
-        setMensagem('Produto registrado com sucesso!');
-        setProduto({
-            nome: '',
-            preco: 0,
-            descricao: '',
-            quantidade: 0,
-            categoria: '',
-            fornecedor: ''
-        });
+        const produtoData: CreateProdutoRequest = {
+            nome: produto.nome.trim(),
+            descricao: produto.descricao.trim(),
+            preco: produto.preco,
+            estoque: produto.estoque
+        };
+
+        await createProduto(produtoData);
+        
+        // Se não houve erro, redirecionar para a lista
+        if (!error) {
+            navigate('/produtos');
+        }
     };
 
     return (
@@ -76,6 +71,18 @@ export default function ProdutoForm() {
                     Voltar
                 </Link>
             </div>
+
+            {mensagem && (
+                <div className="alert alert-warning" role="alert">
+                    {mensagem}
+                </div>
+            )}
+
+            {error && (
+                <div className="alert alert-danger" role="alert">
+                    Erro ao criar produto: {error}
+                </div>
+            )}
 
             <div className="card shadow-sm">
                 <div className="card-header bg-success text-white">
@@ -125,54 +132,31 @@ export default function ProdutoForm() {
                             <input
                                 type="number"
                                 className="form-control"
-                                name="quantidade"
-                                value={produto.quantidade}
+                                name="estoque"
+                                value={produto.estoque}
                                 onChange={handleChange}
                                 min="0"
                                 required
                             />
                         </div>
 
-                        <div className="mb-3">
-                            <label className="form-label">Categoria</label>
-                            <select
-                                className="form-select"
-                                name="categoria"
-                                value={produto.categoria}
-                                onChange={handleChange}
-                                required
+                        <div className="d-grid">
+                            <button 
+                                type="submit" 
+                                className="btn btn-success"
+                                disabled={loading}
                             >
-                                <option value="">Selecione uma categoria</option>
-                                <option value="alimentacao">Alimentação</option>
-                                <option value="higiene">Higiene</option>
-                                <option value="brinquedos">Brinquedos</option>
-                                <option value="acessorios">Acessórios</option>
-                                <option value="medicamentos">Medicamentos</option>
-                            </select>
-                        </div>
-
-                        <div className="mb-3">
-                            <label className="form-label">Fornecedor</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                name="fornecedor"
-                                value={produto.fornecedor}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-
-                        {mensagem && (
-                            <div className={`alert ${mensagem.includes('Erro') ? 'alert-danger' : 'alert-success'}`} role="alert">
-                                {mensagem}
-                            </div>
-                        )}
-
-                        <div className="d-flex justify-content-end">
-                            <button type="submit" className="btn btn-success">
-                                <i className="bi bi-check-lg me-2"></i>
-                                Registrar Produto
+                                {loading ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        Salvando...
+                                    </>
+                                ) : (
+                                    <>
+                                        <i className="bi bi-check-lg me-2"></i>
+                                        Registrar Produto
+                                    </>
+                                )}
                             </button>
                         </div>
                     </form>

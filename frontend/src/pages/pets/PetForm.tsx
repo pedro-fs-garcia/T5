@@ -1,59 +1,43 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-
-interface ClienteData {
-    id: number;
-    nome: string;
-    email: string;
-    telefone: string;
-}
+import { Link, useNavigate } from 'react-router-dom';
+import { useClientes, useCreatePet } from '../../hooks';
+import { CreatePetRequest } from '../../types/api';
 
 interface PetData {
     nome: string;
-    especie: string;
     raca: string;
-    idade: number;
-    peso: number;
-    clienteId: number;
-    observacoes: string;
+    genero: "M" | "F";
+    tipo: string;
+    cliente_id: number;
 }
 
 export default function PetForm() {
-    const [clientes, setClientes] = useState<ClienteData[]>([]);
+    const navigate = useNavigate();
+    const { data: clientes, loading: loadingClientes, error: errorClientes, execute: fetchClientes } = useClientes();
+    const { execute: createPet, loading: loadingCreate, error: errorCreate } = useCreatePet();
+    
     const [pet, setPet] = useState<PetData>({
         nome: '',
-        especie: '',
         raca: '',
-        idade: 0,
-        peso: 0,
-        clienteId: 0,
-        observacoes: ''
+        genero: 'M',
+        tipo: '',
+        cliente_id: 0
     });
-    const [loading, setLoading] = useState(true);
     const [mensagem, setMensagem] = useState('');
 
     useEffect(() => {
-        fetch('/clientes.json')
-            .then((res) => {
-                if (!res.ok) throw new Error('Erro ao buscar os dados dos clientes');
-                return res.json();
-            })
-            .then((data: ClienteData[]) => setClientes(data))
-            .catch((err) => setMensagem(`Erro: ${err.message}`))
-            .finally(() => setLoading(false));
-    }, []);
+        fetchClientes();
+    }, [fetchClientes]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setPet(prev => ({
             ...prev,
-            [name]: name === 'idade' || name === 'peso' || name === 'clienteId' 
-                ? parseFloat(value) 
-                : value
+            [name]: name === 'cliente_id' ? parseInt(value) : value
         }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
         // Validações básicas
@@ -61,41 +45,36 @@ export default function PetForm() {
             setMensagem('O nome do pet é obrigatório');
             return;
         }
-        if (!pet.especie.trim()) {
-            setMensagem('A espécie do pet é obrigatória');
-            return;
-        }
         if (!pet.raca.trim()) {
             setMensagem('A raça do pet é obrigatória');
             return;
         }
-        if (pet.idade <= 0) {
-            setMensagem('A idade do pet deve ser maior que zero');
+        if (!pet.tipo.trim()) {
+            setMensagem('O tipo do pet é obrigatório');
             return;
         }
-        if (pet.peso <= 0) {
-            setMensagem('O peso do pet deve ser maior que zero');
-            return;
-        }
-        if (!pet.clienteId) {
+        if (!pet.cliente_id) {
             setMensagem('O dono do pet é obrigatório');
             return;
         }
 
-        // Aqui você implementaria a lógica para salvar o pet
-        setMensagem('Pet registrado com sucesso!');
-        setPet({
-            nome: '',
-            especie: '',
-            raca: '',
-            idade: 0,
-            peso: 0,
-            clienteId: 0,
-            observacoes: ''
-        });
+        const petData: CreatePetRequest = {
+            nome: pet.nome.trim(),
+            raca: pet.raca.trim(),
+            genero: pet.genero,
+            tipo: pet.tipo.trim(),
+            cliente_id: pet.cliente_id
+        };
+
+        await createPet(petData);
+        
+        // Se não houve erro, redirecionar para a lista
+        if (!errorCreate) {
+            navigate('/pets');
+        }
     };
 
-    if (loading) {
+    if (loadingClientes) {
         return (
             <div className="container py-4">
                 <div className="text-center">
@@ -103,6 +82,20 @@ export default function PetForm() {
                         <span className="visually-hidden">Carregando...</span>
                     </div>
                 </div>
+            </div>
+        );
+    }
+
+    if (errorClientes) {
+        return (
+            <div className="container py-4">
+                <div className="alert alert-danger">
+                    Erro ao carregar clientes: {errorClientes}
+                </div>
+                <Link to="/pets" className="btn btn-outline-secondary">
+                    <i className="bi bi-arrow-left me-2"></i>
+                    Voltar
+                </Link>
             </div>
         );
     }
@@ -118,8 +111,14 @@ export default function PetForm() {
             </div>
 
             {mensagem && (
-                <div className="alert alert-success" role="alert">
+                <div className="alert alert-warning" role="alert">
                     {mensagem}
+                </div>
+            )}
+
+            {errorCreate && (
+                <div className="alert alert-danger" role="alert">
+                    Erro ao criar pet: {errorCreate}
                 </div>
             )}
 
@@ -142,15 +141,15 @@ export default function PetForm() {
                         </div>
 
                         <div className="mb-3">
-                            <label className="form-label">Espécie</label>
+                            <label className="form-label">Tipo</label>
                             <select
                                 className="form-select"
-                                name="especie"
-                                value={pet.especie}
+                                name="tipo"
+                                value={pet.tipo}
                                 onChange={handleChange}
                                 required
                             >
-                                <option value="">Selecione a espécie</option>
+                                <option value="">Selecione o tipo</option>
                                 <option value="Cachorro">Cachorro</option>
                                 <option value="Gato">Gato</option>
                                 <option value="Ave">Ave</option>
@@ -171,47 +170,31 @@ export default function PetForm() {
                             />
                         </div>
 
-                        <div className="row">
-                            <div className="col-md-6 mb-3">
-                                <label className="form-label">Idade (anos)</label>
-                                <input
-                                    type="number"
-                                    className="form-control"
-                                    name="idade"
-                                    value={pet.idade}
-                                    onChange={handleChange}
-                                    min="0"
-                                    step="0.1"
-                                    required
-                                />
-                            </div>
-
-                            <div className="col-md-6 mb-3">
-                                <label className="form-label">Peso (kg)</label>
-                                <input
-                                    type="number"
-                                    className="form-control"
-                                    name="peso"
-                                    value={pet.peso}
-                                    onChange={handleChange}
-                                    min="0"
-                                    step="0.1"
-                                    required
-                                />
-                            </div>
+                        <div className="mb-3">
+                            <label className="form-label">Gênero</label>
+                            <select
+                                className="form-select"
+                                name="genero"
+                                value={pet.genero}
+                                onChange={handleChange}
+                                required
+                            >
+                                <option value="M">Macho</option>
+                                <option value="F">Fêmea</option>
+                            </select>
                         </div>
 
                         <div className="mb-3">
                             <label className="form-label">Dono</label>
                             <select
                                 className="form-select"
-                                name="clienteId"
-                                value={pet.clienteId}
+                                name="cliente_id"
+                                value={pet.cliente_id}
                                 onChange={handleChange}
                                 required
                             >
                                 <option value="">Selecione o dono</option>
-                                {clientes.map(cliente => (
+                                {clientes?.map(cliente => (
                                     <option key={cliente.id} value={cliente.id}>
                                         {cliente.nome}
                                     </option>
@@ -219,21 +202,23 @@ export default function PetForm() {
                             </select>
                         </div>
 
-                        <div className="mb-3">
-                            <label className="form-label">Observações</label>
-                            <textarea
-                                className="form-control"
-                                name="observacoes"
-                                value={pet.observacoes}
-                                onChange={handleChange}
-                                rows={3}
-                            />
-                        </div>
-
                         <div className="d-grid">
-                            <button type="submit" className="btn btn-success">
-                                <i className="bi bi-save me-2"></i>
-                                Registrar Pet
+                            <button 
+                                type="submit" 
+                                className="btn btn-success"
+                                disabled={loadingCreate}
+                            >
+                                {loadingCreate ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        Salvando...
+                                    </>
+                                ) : (
+                                    <>
+                                        <i className="bi bi-save me-2"></i>
+                                        Registrar Pet
+                                    </>
+                                )}
                             </button>
                         </div>
                     </form>
