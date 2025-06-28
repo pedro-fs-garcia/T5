@@ -41,21 +41,17 @@ const Estatisticas: React.FC = () => {
         setCarregando(true);
         setErro(null);
 
-        const [
-          estatisticasQuantidade,
-          itensConsumidos,
-          estatisticasPet,
-          estatisticasValor
-        ] = await Promise.all([
-          servicoEstatisticas.obterTopClientesPorQuantidade(),
-          servicoEstatisticas.obterItensMaisConsumidos(),
-          servicoEstatisticas.obterConsumoPorTipoRaca(),
-          servicoEstatisticas.obterTopClientesPorValor()
-        ]);
-
+        // Load data sequentially to avoid overwhelming the server
+        const estatisticasQuantidade = await servicoEstatisticas.obterTopClientesPorQuantidade();
         setTopClientesPorQuantidade(estatisticasQuantidade);
+
+        const itensConsumidos = await servicoEstatisticas.obterItensMaisConsumidos();
         setItensMaisConsumidos(itensConsumidos);
+
+        const estatisticasPet = await servicoEstatisticas.obterConsumoPorTipoRaca();
         setConsumoPorTipoRaca(estatisticasPet);
+
+        const estatisticasValor = await servicoEstatisticas.obterTopClientesPorValor();
         setTopClientesPorValor(estatisticasValor);
       } catch (err) {
         setErro('Erro ao carregar as estatísticas. Por favor, tente novamente.');
@@ -70,12 +66,14 @@ const Estatisticas: React.FC = () => {
 
   if (carregando) {
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
-        <div className="text-center">
-          <div className="spinner-border text-muted" role="status" style={{ width: '3rem', height: '3rem' }}>
-            <span className="visually-hidden">Carregando...</span>
+      <div className="container-fluid py-5" style={{ backgroundColor: '#f8f9fa' }}>
+        <div className="row justify-content-center">
+          <div className="col-12 text-center">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Carregando...</span>
+            </div>
+            <p className="mt-3 text-muted">Carregando estatísticas...</p>
           </div>
-          <p className="mt-3 text-muted fs-5">Carregando estatísticas...</p>
         </div>
       </div>
     );

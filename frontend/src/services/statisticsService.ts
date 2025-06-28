@@ -33,19 +33,39 @@ export class ServicoEstatisticas {
   private baseURL = 'http://localhost:3001/api';
 
   private async fazerRequisicao<T>(endpoint: string): Promise<T> {
-    const response = await fetch(`${this.baseURL}${endpoint}`);
-    
-    if (!response.ok) {
-      throw new Error(`Erro na requisição: ${response.status}`);
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+      const response = await fetch(`${this.baseURL}${endpoint}`, {
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new Error(`Erro na requisição: ${response.status} - ${response.statusText}`);
+      }
+      
+      const data: ApiResponse<T> = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Erro desconhecido no servidor');
+      }
+      
+      return data.data!;
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        throw new Error('Timeout: A requisição demorou muito para responder');
+      }
+      if (error.message.includes('Failed to fetch')) {
+        throw new Error('Erro de conexão: Verifique se o servidor está rodando');
+      }
+      throw error;
     }
-    
-    const data: ApiResponse<T> = await response.json();
-    
-    if (!data.success) {
-      throw new Error(data.error || 'Erro desconhecido');
-    }
-    
-    return data.data!;
   }
 
   // Obter top 10 clientes por quantidade de consumo

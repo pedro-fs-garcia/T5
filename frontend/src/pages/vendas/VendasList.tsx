@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useClienteProdutos, useClienteServicos } from '../../hooks';
 import { formatCurrency } from '../../utils/apiUtils';
