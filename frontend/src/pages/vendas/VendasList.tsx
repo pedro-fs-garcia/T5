@@ -114,7 +114,7 @@ export default function VendaList() {
         <div className="container py-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2>Vendas</h2>
-                <Link to="/vendas/nova" className="btn btn-success">
+                <Link to="/vendas/novo" className="btn btn-success">
                     <i className="bi bi-plus-lg me-2"></i>
                     Nova Venda
                 </Link>
