@@ -85,9 +85,10 @@ cd T5
 
 ### Executando Frontend e Backend Juntos
 
-A partir da raiz do projeto (`T5`), você pode iniciar o frontend e o backend simultaneamente com um único comando:
+A partir da raiz do projeto (`T5`), você pode iniciar o frontend e o backend simultaneamente:
 
 ```bash
+npm install
 npm start
 ```
 
