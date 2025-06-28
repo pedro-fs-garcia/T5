@@ -15,6 +15,9 @@ import DetalhesPet from "../pages/pets/DetalhePet";
 import ProdutoDetalhes from "../pages/produtos/ProdutoDetalhes";
 import RegistroServico from "../pages/servicos/RegistroServico";
 import ServicoDetalhes from "../pages/servicos/ServicoDetalhes";
+import Statistics from "../components/Statistics";
+
+
 export default function AppRoutes() {
     return (
         <Routes>
@@ -49,6 +52,8 @@ export default function AppRoutes() {
             <Route path="/vendas/novo" element={<RegistroVenda />} />
             <Route path="/vendas/:tipo/:id" element={<DetalheVenda editar='false' />} />
             <Route path="/vendas/:tipo/:id/editar" element={<DetalheVenda editar='true' />} />
+
+            <Route path="/estatisticas" element={<Statistics />} />
         </Routes >
     );
 }

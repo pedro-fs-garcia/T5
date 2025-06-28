@@ -8,6 +8,7 @@ import { TelefoneController } from '../controllers/telefoneController';
 import { EnderecoController } from '../controllers/enderecoController';
 import { ClienteServicoController } from '../controllers/clienteServicoController';
 import { ClienteProdutoController } from '../controllers/clienteProdutoController';
+import { StatisticsController } from '../controllers/statisticsController';
 
 const router = Router();
 const clienteController = new ClienteController();
@@ -19,6 +20,7 @@ const telefoneController = new TelefoneController();
 const enderecoController = new EnderecoController();
 const clienteServicoController = new ClienteServicoController();
 const clienteProdutoController = new ClienteProdutoController();
+const statisticsController = new StatisticsController();
 
 // Cliente routes
 router.post('/clientes', (req: Request, res: Response) => clienteController.create(req, res));
@@ -84,5 +86,11 @@ router.get('/cliente-produtos', (req: Request, res: Response) => clienteProdutoC
 router.get('/cliente-produtos/:id', (req: Request, res: Response) => clienteProdutoController.getById(req, res));
 router.put('/cliente-produtos/:id', (req: Request, res: Response) => clienteProdutoController.update(req, res));
 router.delete('/cliente-produtos/:id', (req: Request, res: Response) => clienteProdutoController.delete(req, res));
+
+// Statistics routes
+router.get('/estatisticas/top-clientes-quantidade', (req: Request, res: Response) => statisticsController.getTopClientesPorQuantidade(req, res));
+router.get('/estatisticas/itens-mais-consumidos', (req: Request, res: Response) => statisticsController.getItensMaisConsumidos(req, res));
+router.get('/estatisticas/consumo-por-tipo-raca', (req: Request, res: Response) => statisticsController.getConsumoPorTipoRaca(req, res));
+router.get('/estatisticas/top-clientes-valor', (req: Request, res: Response) => statisticsController.getTopClientesPorValor(req, res));
 
 export default router; 

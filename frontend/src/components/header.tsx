@@ -39,6 +39,9 @@ export default function Header() {
                             <li className="nav-item">
                                 <Link to="/vendas" className="nav-link">Vendas</Link>
                             </li>
+                            <li className="nav-item">
+                                <Link to="/estatisticas" className="nav-link">Estatísticas</Link>
+                            </li>
                         </ul>
                     </div>
                 </nav>

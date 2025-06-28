@@ -18,7 +18,7 @@ export default function HomePage() {
                 {/* Main Content */}
                 <div className="row g-4 mb-5">
                     {/* Cadastros Card */}
-                    <div className="col-md-4">
+                    <div className="col-md-3">
                         <div className="card h-100 border-subtle shadow-sm">
                             <div className="card-header bg-white border-bottom-0 pb-0">
                                 <h2 className="card-title  fs-3 d-flex align-items-center">
@@ -63,7 +63,7 @@ export default function HomePage() {
                         </div>
                     </div>
 
-                    <div className="col-md-4">
+                    <div className="col-md-3">
                         <div className="card h-100 border-subtle shadow-sm">
                             <div className="card-header bg-white border-bottom-0 pb-0">
                                 <h2 className="card-title  fs-3 d-flex align-items-center">
@@ -109,7 +109,7 @@ export default function HomePage() {
                     </div>
 
                     {/* Registros Card */}
-                    <div className="col-md-4">
+                    <div className="col-md-3">
                         <div className="card h-100 border-subtle shadow-sm">
                             <div className="card-header bg-white border-bottom-0 pb-0">
                                 <h2 className="card-title text-dark fs-3 d-flex align-items-center">
@@ -139,6 +139,31 @@ export default function HomePage() {
                             </div>
                         </div>
                         
+                    </div>
+
+                    {/* Estatísticas Card */}
+                    <div className="col-md-3">
+                        <div className="card h-100 border-subtle shadow-sm">
+                            <div className="card-header bg-white border-bottom-0 pb-0">
+                                <h2 className="card-title text-dark fs-3 d-flex align-items-center">
+                                    <i className="bi bi-graph-up me-2"></i>
+                                    Estatísticas
+                                </h2>
+                                <p className="card-text text-muted">Visualize dados e métricas do seu petshop</p>
+                            </div>
+                            <div className="card-body d-grid gap-3">
+                                <a href="/estatisticas" className="text-decoration-none">
+                                    <button className="btn btn-outline-info w-100 text-start d-flex align-items-center">
+                                        <i className="bi bi-graph-up me-2"></i>
+                                        <span>Dashboard</span>
+                                        <i className="bi bi-arrow-right ms-auto opacity-50"></i>
+                                    </button>
+                                </a>
+                            </div>
+                            <div className="card-footer bg-white border-top-0">
+                                <p className="text-muted small">Acompanhe o desempenho do seu negócio</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
