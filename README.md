@@ -19,44 +19,6 @@ O projeto visa aplicar conceitos de **UI Design**, focando em criar uma experiê
 
 Desenvolver o frontend e o backend de um sistema completo de Pet Shop com funcionalidades de gerenciamento de clientes, pets, produtos e serviços.
 
-## Funcionalidades Implementadas
-
-### 1. CRUD de Clientes
-- ✅ Criar, listar, atualizar e excluir clientes
-- ✅ Gerenciamento de documentos (CPF, RG)
-- ✅ Gerenciamento de telefones
-- ✅ Gerenciamento de endereços
-
-### 2. CRUD de Pets
-- ✅ Criar, listar, atualizar e excluir pets
-- ✅ Associação de pets aos clientes
-- ✅ Informações: nome, raça, gênero, tipo
-
-### 3. CRUD de Produtos e Serviços
-- ✅ Criar, listar, atualizar e excluir produtos
-- ✅ Criar, listar, atualizar e excluir serviços
-- ✅ Categorização e preços
-
-### 4. Registro de Consumo
-- ✅ Registro de produtos/serviços adquiridos por clientes
-- ✅ Histórico de compras
-
-### 5. Relatórios e Estatísticas
-- ✅ Top 10 clientes que mais consumiram (quantidade)
-- ✅ Listagem geral dos produtos/serviços mais consumidos
-- ✅ Produtos/serviços mais consumidos por tipo e raça de pets
-- ✅ Top 5 clientes que mais consumiram (valor)
-
-## Estrutura do Projeto
-
-```
-T5/
-├── frontend/          # Aplicação React + TypeScript
-├── backend/           # API Express + TypeScript
-├── API_DOCUMENTATION.md
-└── README.md
-```
-
 ## Pré-requisitos
 
 - Node.js (versão 18 ou superior)
@@ -164,6 +126,82 @@ npm start
    npm run build
    npm run preview
    ```
+
+## Como Executar o Projeto (Tudo em um único comando)
+1. **Inicie o backend e o frontend juntos:**
+   
+   ```bash
+   npm start
+   ```
+   - O backend será iniciado em: `http://localhost:3001`
+   - O frontend será iniciado em: `http://localhost:3000`
+
+---
+
+## Fluxo Completo (Passo a Passo)
+
+1. **Clone o repositório:**
+   ```bash
+   git clone <url-do-repositorio>
+   cd T5
+   ```
+2. **Instale todas as dependências:**
+   ```bash
+   npm install
+   ```
+3. **Configure o banco de dados MySQL** (veja instruções na seção de configuração do banco de dados).
+4. **Configure as variáveis de ambiente do backend** (arquivo `.env` em `backend/`).
+5. **Execute o setup do banco de dados:**
+   ```bash
+   cd backend
+   npm run dev
+   ```
+   > O sistema irá criar automaticamente as tabelas necessárias.
+6. **Volte para a raiz do projeto e rode tudo junto:**
+   ```bash
+   cd ..
+   npm start
+   ```
+
+---
+
+## Funcionalidades Implementadas
+
+### 1. CRUD de Clientes
+- ✅ Criar, listar, atualizar e excluir clientes
+- ✅ Gerenciamento de documentos (CPF, RG)
+- ✅ Gerenciamento de telefones
+- ✅ Gerenciamento de endereços
+
+### 2. CRUD de Pets
+- ✅ Criar, listar, atualizar e excluir pets
+- ✅ Associação de pets aos clientes
+- ✅ Informações: nome, raça, gênero, tipo
+
+### 3. CRUD de Produtos e Serviços
+- ✅ Criar, listar, atualizar e excluir produtos
+- ✅ Criar, listar, atualizar e excluir serviços
+- ✅ Categorização e preços
+
+### 4. Registro de Consumo
+- ✅ Registro de produtos/serviços adquiridos por clientes
+- ✅ Histórico de compras
+
+### 5. Relatórios e Estatísticas
+- ✅ Top 10 clientes que mais consumiram (quantidade)
+- ✅ Listagem geral dos produtos/serviços mais consumidos
+- ✅ Produtos/serviços mais consumidos por tipo e raça de pets
+- ✅ Top 5 clientes que mais consumiram (valor)
+
+## Estrutura do Projeto
+
+```
+T5/
+├── frontend/          # Aplicação React + TypeScript
+├── backend/           # API Express + TypeScript
+├── API_DOCUMENTATION.md
+└── README.md
+```
 
 ## Endpoints da API
 
