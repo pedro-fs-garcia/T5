@@ -25,6 +25,8 @@ interface EstatisticasPet {
   itens: EstatisticasItem[];
 }
 
+const servicoEstatisticas = new ServicoEstatisticas();
+
 const Estatisticas: React.FC = () => {
   const [topClientesPorQuantidade, setTopClientesPorQuantidade] = useState<EstatisticasConsumo[]>([]);
   const [itensMaisConsumidos, setItensMaisConsumidos] = useState<EstatisticasItem[]>([]);
@@ -32,8 +34,6 @@ const Estatisticas: React.FC = () => {
   const [topClientesPorValor, setTopClientesPorValor] = useState<EstatisticasConsumo[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
-
-  const servicoEstatisticas = new ServicoEstatisticas();
 
   useEffect(() => {
     const carregarDados = async () => {
