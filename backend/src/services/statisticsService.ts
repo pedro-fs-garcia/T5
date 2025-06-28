@@ -26,7 +26,6 @@ export interface EstatisticasPet {
 }
 
 export class StatisticsService {
-  // Obter top 10 clientes por quantidade de consumo
   async obterTopClientesPorQuantidade(): Promise<ApiResponse<EstatisticasConsumo[]>> {
     try {
       const [result] = await pool.execute(`
@@ -65,7 +64,6 @@ export class StatisticsService {
     }
   }
 
-  // Obter itens mais consumidos
   async obterItensMaisConsumidos(): Promise<ApiResponse<EstatisticasItem[]>> {
     try {
       const [result] = await pool.execute(`
@@ -110,10 +108,8 @@ export class StatisticsService {
     }
   }
 
-  // Obter consumo por tipo e raça de pet
   async obterConsumoPorTipoRaca(): Promise<ApiResponse<EstatisticasPet[]>> {
     try {
-      // Primeiro, vamos obter os dados de produtos por pet
       const [produtosResult] = await pool.execute(`
         SELECT 
           pet.tipo,
@@ -145,13 +141,11 @@ export class StatisticsService {
         HAVING quantidade_total > 0
       `);
 
-      // Combinar os resultados
       const todosResultados = [
         ...(produtosResult as any[]).map(row => ({ ...row, is_produto: true })),
         ...(servicosResult as any[]).map(row => ({ ...row, is_produto: false }))
       ];
 
-      // Agrupar por tipo e raça
       const estatisticasPorPet = new Map<string, EstatisticasPet>();
 
       todosResultados.forEach(row => {
@@ -188,7 +182,6 @@ export class StatisticsService {
     }
   }
 
-  // Obter top 5 clientes por valor
   async obterTopClientesPorValor(): Promise<ApiResponse<EstatisticasConsumo[]>> {
     try {
       const [result] = await pool.execute(`

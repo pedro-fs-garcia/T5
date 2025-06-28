@@ -121,6 +121,19 @@ cd T5
 
 ## Como Executar
 
+### Executando Frontend e Backend Juntos
+
+A partir da raiz do projeto (`T5`), você pode iniciar o frontend e o backend simultaneamente com um único comando:
+
+```bash
+npm start
+```
+
+- O backend será iniciado em `http://localhost:3001`
+- O frontend será iniciado em `http://localhost:3000`
+
+> Certifique-se de que as dependências estejam instaladas nas pastas `backend/` e `frontend/` antes de rodar o comando acima.
+
 ### Backend
 
 1. **Em desenvolvimento (com hot reload)**
@@ -128,7 +141,7 @@ cd T5
    cd backend
    npm run dev
    ```
-   O servidor estará disponível em: `http://localhost:3000`
+   O servidor estará disponível em: `http://localhost:3001`
 
 2. **Em produção**
    ```bash
@@ -143,7 +156,7 @@ cd T5
    cd frontend
    npm run dev
    ```
-   A aplicação estará disponível em: `http://localhost:5173`
+   A aplicação estará disponível em: `http://localhost:3000`
 
 2. **Build para produção**
    ```bash
@@ -154,7 +167,7 @@ cd T5
 
 ## Endpoints da API
 
-A API está disponível em `http://localhost:3000/api` e inclui os seguintes endpoints:
+A API está disponível em `http://localhost:3001/api` e inclui os seguintes endpoints:
 
 ### Clientes
 - `GET /api/clientes` - Listar todos os clientes

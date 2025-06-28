@@ -148,7 +148,6 @@ export class ClienteProdutoService {
                 };
             }
 
-            // Recalcular valor total
             const quantidade = updates.quantidade ?? (existingClienteProduto as any[])[0].quantidade;
             const valorUnitario = updates.valor_unitario ?? (existingClienteProduto as any[])[0].valor_unitario;
             const desconto = updates.desconto ?? (existingClienteProduto as any[])[0].desconto;
